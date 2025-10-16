@@ -1,0 +1,17 @@
+{
+  "name": "autoinjector",
+  "version": "0.1.0",
+  "description": "Automatic injection of scripts and CSS",
+  "license": "MIT",
+  "author": "xdmpx",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc && cp ./manifest.json ./dist/manifest.json"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.12",
+    "typescript": "^5.9.2"
+  }
+}
