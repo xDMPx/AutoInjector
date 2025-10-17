@@ -10,7 +10,20 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
             func: (code: string, hash: number) => {
                 const auto_injector_script = document.getElementById(`autoinjector-script-${hash}`);
                 if (auto_injector_script !== null) return;
+
                 console.log(`AutoInjector; Script Injection => ${code}`);
+
+                // Crate Trusted Types policy to allow injection on website with Trusted Types requirements 
+                if (window.trustedTypes !== undefined) {
+                    if (window.trustedTypes.defaultPolicy === null) {
+                        window.trustedTypes?.createPolicy('default', {
+                            createScript: (input: string) => {
+                                return input;
+                            }
+                        });
+                    }
+                }
+
                 const script = document.createElement("script");
                 script.type = "text/javascript";
                 script.id = `autoinjector-script-${hash}`;
@@ -29,6 +42,6 @@ function djb2_hash(str: string): number {
         hash = (((hash << 5) + hash) + str.charCodeAt(i));
 
     }
-    //non‑negative 32‑bit value
+    //non-negative 32-bit value
     return hash >>> 0;
 }
