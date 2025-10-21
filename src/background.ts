@@ -1,6 +1,16 @@
-const scripts = ["alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", "alert(\"Hello! I am an alert box 2!! Caused by AutoInjector script 2\");"]
+chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
+    if (details.reason === "update") {
+        let scripts = await getAutoInjectorScripts();
+        if (scripts === undefined) {
+            saveAutoInjectorScript("alert(\"Hello! I am an alert box!! Caused by AutoInjector\");");
+        }
+    }
+});
+
 
 chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedInfo) => {
+    const scripts = await getAutoInjectorScripts();
+    if (scripts === undefined) return;
     for (const code of scripts) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
@@ -15,6 +25,8 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
 
 chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.OnUpdatedInfo) => {
     if (updateinfo.status === chrome.tabs.TabStatus.COMPLETE) {
+        const scripts = await getAutoInjectorScripts();
+        if (scripts === undefined) return;
         for (const code of scripts) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
@@ -62,4 +74,19 @@ function djb2_hash(str: string): number {
     }
     //non-negative 32-bit value
     return hash >>> 0;
+}
+
+async function getAutoInjectorScripts(): Promise<string[] | undefined> {
+    const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
+    console.log(scripts);
+    return scripts;
+}
+
+async function saveAutoInjectorScript(script: string) {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+    scripts.push(script);
+    await chrome.storage.local.set({ "scripts": scripts });
 }
