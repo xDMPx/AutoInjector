@@ -1,3 +1,5 @@
+import { djb2Hash, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
+
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
     if (details.reason === "update") {
         let scripts = await getAutoInjectorScripts();
@@ -14,10 +16,10 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     for (const code of scripts) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
-            args: [code, djb2_hash(code)],
+            args: [code, djb2Hash(code)],
             //injectImmediately: true,
             world: "MAIN",
-            func: inject_script,
+            func: injectScript,
         });
     }
 });
@@ -30,16 +32,16 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         for (const code of scripts) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
-                args: [code, djb2_hash(code)],
+                args: [code, djb2Hash(code)],
                 //injectImmediately: true,
                 world: "MAIN",
-                func: inject_script,
+                func: injectScript,
             });
         }
     }
 });
 
-function inject_script(code: string, hash: number) {
+function injectScript(code: string, hash: number) {
     const auto_injector_script = document.getElementById(`autoinjector-script-${hash}`);
     if (auto_injector_script !== null) return;
 
@@ -63,30 +65,4 @@ function inject_script(code: string, hash: number) {
     document.body.appendChild(script);
     console.log(script);
 
-}
-
-// http://www.cse.yorku.ca/~oz/hash.html
-function djb2_hash(str: string): number {
-    let hash = 5381;
-    for (let i = 0; i < str.length; i++) {
-        hash = (((hash << 5) + hash) + str.charCodeAt(i));
-
-    }
-    //non-negative 32-bit value
-    return hash >>> 0;
-}
-
-async function getAutoInjectorScripts(): Promise<string[] | undefined> {
-    const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
-    console.log(scripts);
-    return scripts;
-}
-
-async function saveAutoInjectorScript(script: string) {
-    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
-    if (scripts === undefined) {
-        scripts = [];
-    }
-    scripts.push(script);
-    await chrome.storage.local.set({ "scripts": scripts });
 }
