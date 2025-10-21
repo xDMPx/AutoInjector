@@ -9,6 +9,11 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
     }
 });
 
+chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {
+    chrome.tabs.create({
+        url: chrome.runtime.getURL("dashboard.html")
+    });
+});
 
 chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedInfo) => {
     const scripts = await getAutoInjectorScripts();
@@ -23,7 +28,6 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
         });
     }
 });
-
 
 chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.OnUpdatedInfo) => {
     if (updateinfo.status === chrome.tabs.TabStatus.COMPLETE) {
