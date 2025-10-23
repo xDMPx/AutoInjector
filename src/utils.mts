@@ -31,3 +31,12 @@ export async function deleteAutoInjectorScript(i: number) {
     scripts.splice(i, 1);
     await chrome.storage.local.set({ "scripts": scripts });
 }
+
+export async function editAutoInjectorScript(i: number, script: string) {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+    scripts[i] = script;
+    await chrome.storage.local.set({ "scripts": scripts });
+}
