@@ -1,3 +1,5 @@
+import { Script } from "./interfaces.mjs";
+
 // http://www.cse.yorku.ca/~oz/hash.html
 export function djb2Hash(str: string): number {
     let hash = 5381;
@@ -9,22 +11,25 @@ export function djb2Hash(str: string): number {
     return hash >>> 0;
 }
 
-export async function getAutoInjectorScripts(): Promise<string[] | undefined> {
-    const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
+export async function getAutoInjectorScripts(): Promise<Script[] | undefined> {
+    const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     return scripts;
 }
 
-export async function saveAutoInjectorScript(script: string) {
-    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
+export async function saveAutoInjectorScript(script: string, enabled: boolean = true) {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
     }
-    scripts.push(script);
+    scripts.push({
+        code: script,
+        enabled: true
+    });
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
 export async function deleteAutoInjectorScript(i: number) {
-    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
     }
@@ -33,10 +38,28 @@ export async function deleteAutoInjectorScript(i: number) {
 }
 
 export async function editAutoInjectorScript(i: number, script: string) {
-    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: string[] | undefined };
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
     }
-    scripts[i] = script;
+    scripts[i].code = script;
+    await chrome.storage.local.set({ "scripts": scripts });
+}
+
+export async function enableAutoInjectorScript(i: number) {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+    scripts[i].enabled = true;
+    await chrome.storage.local.set({ "scripts": scripts });
+}
+
+export async function disableAutoInjectorScript(i: number) {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+    scripts[i].enabled = false;
     await chrome.storage.local.set({ "scripts": scripts });
 }

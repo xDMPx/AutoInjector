@@ -4,7 +4,7 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
     if (details.reason === "update") {
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
-            saveAutoInjectorScript("alert(\"Hello! I am an alert box!! Caused by AutoInjector\");");
+            saveAutoInjectorScript("alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
         }
     }
 });
@@ -18,7 +18,7 @@ chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {
 chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedInfo) => {
     const scripts = await getAutoInjectorScripts();
     if (scripts === undefined) return;
-    for (const code of scripts) {
+    for (const code of scripts.filter((s) => s.enabled).map((s) => s.code)) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
             args: [code, djb2Hash(code)],
@@ -33,7 +33,7 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
     if (updateinfo.status === chrome.tabs.TabStatus.COMPLETE) {
         const scripts = await getAutoInjectorScripts();
         if (scripts === undefined) return;
-        for (const code of scripts) {
+        for (const code of scripts.filter((s) => s.enabled).map((s) => s.code)) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 args: [code, djb2Hash(code)],
