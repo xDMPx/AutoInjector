@@ -11,16 +11,16 @@ async function main() {
             for (const [i, { code, enabled }] of scripts.entries()) {
                 const list_item = document.createElement("li");
                 const div = document.createElement("div");
-                div.className = "inline-flex w-1/2 p-4 gap-4";
-
+                div.className = "inline-flex w-5/6 p-4 gap-4";
                 const p = document.createElement("p");
                 p.innerText = code;
-                p.className = "w-3/4";
+                p.className = "w-3/4 whitespace-pre-wrap";
                 const bdiv = document.createElement("div");
                 bdiv.className = "flex gap-4";
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
                 checkbox.checked = enabled;
+                checkbox.className = "checkbox checkbox-primary my-auto";
                 checkbox.onclick = () => { toggleScriptEnabled(i, checkbox.checked) };
                 const edit_button = document.createElement("button");
                 edit_button.className = "btn btn-accent m-auto";
