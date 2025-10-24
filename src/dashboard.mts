@@ -24,11 +24,11 @@ async function main() {
                 checkbox.onclick = () => { toggleScriptEnabled(i, checkbox.checked) };
                 const edit_button = document.createElement("button");
                 edit_button.className = "btn btn-accent m-auto";
-                edit_button.innerText = "E";
+                edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
                 edit_button.onclick = () => { editScriptMode(i, code) };
                 const delete_button = document.createElement("button");
                 delete_button.className = "btn btn-accent m-auto ";
-                delete_button.innerText = "X";
+                delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
                 delete_button.onclick = () => { deleteScript(i) };
 
                 bdiv.appendChild(checkbox);
