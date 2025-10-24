@@ -7,17 +7,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="dashboard.css">
     <title>AutoInjector Dashboard</title>
 </head>
 
 <body>
     <div>
-        <div style="display: grid; width: 50%">
-            <textarea id="user-script" placeholder="JavaScript"></textarea>
-            <button id="submit-script">Submit</button>
+        <div class="grid w-1/2 p-4 gap-2">
+            <textarea class="outline p-4" id="user-script" placeholder="JavaScript"></textarea>
+            <button class="btn btn-primary" id="submit-script">Submit</button>
         </div>
         <div id="script-div"></div>
     </div>
+
 </body>
 
 <script type="module" src="dashboard.mjs"></script>

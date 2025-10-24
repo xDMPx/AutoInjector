@@ -10,7 +10,9 @@
         "echo \"Error: no test specified\" && exit 1"
       ],
       "build": [
+        "set -xe",
         "npx tsc",
+        "npx @tailwindcss/cli -i ./src/dashboard.css -o ./dist/dashboard.css",
         "cp ./manifest.json ./dist/manifest.json",
         "cp ./dashboard.html ./dist/dashboard.html"
       ],

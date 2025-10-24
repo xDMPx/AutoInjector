@@ -6,27 +6,28 @@ async function main() {
 
     if (script_div !== null) {
         const list = document.createElement("ol");
+        list.className = "list-decimal list-inside p-1";
         if (scripts !== undefined) {
             for (const [i, { code, enabled }] of scripts.entries()) {
                 const list_item = document.createElement("li");
                 const div = document.createElement("div");
-                div.style = "display: flex; padding: 4px; gap: 4px;";
+                div.className = "inline-flex w-1/2 p-4 gap-4";
 
                 const p = document.createElement("p");
                 p.innerText = code;
-                p.style = "width: 75%";
+                p.className = "w-3/4";
                 const bdiv = document.createElement("div");
-                bdiv.style = "display: flex; gap: 5px;";
+                bdiv.className = "flex gap-4";
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
                 checkbox.checked = enabled;
                 checkbox.onclick = () => { toggleScriptEnabled(i, checkbox.checked) };
                 const edit_button = document.createElement("button");
-                edit_button.style = "margin: auto; padding: 5px;";
+                edit_button.className = "btn btn-accent m-auto";
                 edit_button.innerText = "E";
                 edit_button.onclick = () => { editScriptMode(i, code) };
                 const delete_button = document.createElement("button");
-                delete_button.style = "margin: auto; padding: 5px;";
+                delete_button.className = "btn btn-accent m-auto ";
                 delete_button.innerText = "X";
                 delete_button.onclick = () => { deleteScript(i) };
 
