@@ -46,6 +46,10 @@ async function main() {
     const submit_script = document.getElementById("submit-script")!;
     submit_script.onclick = saveScript;
 
+
+    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+    user_script_text.oninput = () => { autoResizeTextArea() };
+    autoResizeTextArea();
 }
 
 main();
@@ -53,9 +57,19 @@ main();
 function editScriptMode(i: number, script: string) {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const submit_script = document.getElementById("submit-script")!;
+    user_script_text.style.height = 'auto';
     submit_script.textContent = "Save";
     submit_script.onclick = () => { editScript(i) };
     user_script_text.value = script;
+    user_script_text.style.height = `${user_script_text.scrollHeight}px`;
+}
+
+
+function autoResizeTextArea() {
+    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+    // recalculate the scrollHeight 
+    user_script_text.style.height = 'auto';
+    user_script_text.style.height = `${user_script_text.scrollHeight}px`;
 }
 
 async function saveScript() {
