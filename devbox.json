@@ -14,7 +14,7 @@
         "npx tsc",
         "npx @tailwindcss/cli -i ./src/dashboard.css -o ./dist/dashboard.css",
         "cp ./manifest.json ./dist/manifest.json",
-        "cp ./dashboard.html ./dist/dashboard.html"
+        "cp ./src/dashboard.html ./dist/dashboard.html"
       ],
       "update": [
         "npm update"
