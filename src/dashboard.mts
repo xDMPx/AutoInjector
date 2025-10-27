@@ -45,6 +45,7 @@ async function main() {
 
     const submit_script = document.getElementById("submit-script")!;
     submit_script.onclick = saveScript;
+
 }
 
 main();
@@ -65,8 +66,16 @@ async function saveScript() {
 }
 
 async function deleteScript(i: number) {
-    await deleteAutoInjectorScript(i);
-    location.reload();
+    const delete_script_modal = document.getElementById("delete_script_modal")! as HTMLDialogElement;
+    delete_script_modal.showModal();
+    delete_script_modal.onsubmit = async (e) => {
+        e.preventDefault();
+        if (e.submitter?.id === "delete_script_modal-yes") {
+            await deleteAutoInjectorScript(i);
+            location.reload();
+        }
+        delete_script_modal.close();
+    };
 }
 
 async function editScript(i: number) {
