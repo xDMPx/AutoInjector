@@ -21,8 +21,7 @@ async function main() {
                     const script_collapse_title_div = document.createElement("div");
                     script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
                     script_collapse_title_div.innerText = code.slice(0, new_line_pos);
-                    const script_collapse_content_div = document.createElement("div");
-                    script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
+                    const script_collapse_content_div = document.createElement("div"); script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
                     script_collapse_content_div.innerText = code.slice(new_line_pos);
                     script_collapse_div.appendChild(script_collapse_title_div);
                     script_collapse_div.appendChild(script_collapse_content_div);
@@ -70,6 +69,9 @@ async function main() {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     user_script_text.oninput = () => { autoResizeTextArea() };
     autoResizeTextArea();
+
+    const export_button = document.getElementById("btn_export")!;
+    export_button.onclick = exportScripts;
 }
 
 main();
@@ -126,4 +128,17 @@ async function toggleScriptEnabled(i: number, enabled: boolean) {
         await disableAutoInjectorScript(i);
     }
     location.reload();
+}
+
+async function exportScripts() {
+    let scripts = await getAutoInjectorScripts();
+    if (scripts !== undefined) {
+        const scripts_json = JSON.stringify(scripts, null);
+        const url = `data:application/json;base64,${btoa(scripts_json)}`;
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "autoinjector_scripts.json";
+        a.click();
+    }
+
 }
