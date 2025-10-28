@@ -13,18 +13,27 @@ async function main() {
                 const div = document.createElement("div");
                 div.className = "inline-flex w-5/6 p-4 gap-4";
 
-                let new_line_pos = code.indexOf('\n');
                 const script_collapse_div = document.createElement("div");
-                script_collapse_div.tabIndex = 0;
-                script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
-                const script_collapse_title_div = document.createElement("div");
-                script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
-                script_collapse_title_div.innerText = code.slice(0, new_line_pos);
-                const script_collapse_content_div = document.createElement("div");
-                script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
-                script_collapse_content_div.innerText = code.slice(i + new_line_pos);
-                script_collapse_div.appendChild(script_collapse_title_div);
-                script_collapse_div.appendChild(script_collapse_content_div);
+                if (code.split('\n').length > 1) {
+                    let new_line_pos = code.indexOf('\n');
+                    script_collapse_div.tabIndex = 0;
+                    script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
+                    const script_collapse_title_div = document.createElement("div");
+                    script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
+                    script_collapse_title_div.innerText = code.slice(0, new_line_pos);
+                    const script_collapse_content_div = document.createElement("div");
+                    script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
+                    script_collapse_content_div.innerText = code.slice(new_line_pos);
+                    script_collapse_div.appendChild(script_collapse_title_div);
+                    script_collapse_div.appendChild(script_collapse_content_div);
+                } else {
+                    script_collapse_div.tabIndex = 0;
+                    script_collapse_div.className = "bg-base-100 border-base-300 border w-3/4 ";
+                    const script_collapse_title_div = document.createElement("div");
+                    script_collapse_title_div.className = "p-1 whitespace-pre-wrap";
+                    script_collapse_title_div.innerText = code;
+                    script_collapse_div.appendChild(script_collapse_title_div);
+                }
 
                 const bdiv = document.createElement("div");
                 bdiv.className = "flex gap-4";
