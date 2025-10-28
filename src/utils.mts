@@ -23,7 +23,7 @@ export async function saveAutoInjectorScript(script: string, enabled: boolean = 
     }
     scripts.push({
         code: script,
-        enabled: true
+        enabled: enabled
     });
     await chrome.storage.local.set({ "scripts": scripts });
 }

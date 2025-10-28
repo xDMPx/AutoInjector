@@ -1,3 +1,4 @@
+import { Script } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, disableAutoInjectorScript, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 async function main() {
@@ -72,6 +73,9 @@ async function main() {
 
     const export_button = document.getElementById("btn_export")!;
     export_button.onclick = exportScripts;
+
+    const import_button = document.getElementById("btn_import")!;
+    import_button.onclick = onImportScriptsClick;
 }
 
 main();
@@ -141,4 +145,31 @@ async function exportScripts() {
         a.click();
     }
 
+}
+
+async function onImportScriptsClick() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file !== undefined) {
+            const reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = (e) => {
+                if (e.target !== null && e.target.result != undefined)
+                    importScripts(e.target?.result.toString())
+            }
+        }
+    };
+    input.click();
+}
+
+async function importScripts(data: string) {
+    const scripts = JSON.parse(data) as Script[];
+    for (const script of scripts) {
+        await saveAutoInjectorScript(script.code, script.enabled);
+    }
+    location.reload();
 }
