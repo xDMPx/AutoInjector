@@ -212,13 +212,31 @@ async function importScripts(data: string) {
     const saved_scripts_hash = new Set(saved_scripts);
 
     const scripts = JSON.parse(data) as Script[];
+    const duplicate_scripts: Script[] = [];
     for (const script of scripts) {
         if (saved_scripts_hash.has(djb2Hash(script.code))) {
             console.log("Duplicate script:");
             console.log(script.code);
+            duplicate_scripts.push(script);
             continue;
         };
         await saveAutoInjectorScript(script.code, script.enabled);
     }
-    location.reload();
+    if (duplicate_scripts.length > 0) {
+        const import_duplicate_script_modal = document.getElementById("import_duplicate_script_modal")! as HTMLDialogElement;
+        import_duplicate_script_modal.showModal();
+        import_duplicate_script_modal.onsubmit = async (e) => {
+            e.preventDefault();
+            if (e.submitter?.id === "import_duplicate_script_modal-yes") {
+                for (const script of duplicate_scripts) {
+                    await saveAutoInjectorScript(script.code, script.enabled);
+                }
+            }
+            import_duplicate_script_modal.close();
+            location.reload();
+        };
+    } else {
+        location.reload();
+    }
+
 }
