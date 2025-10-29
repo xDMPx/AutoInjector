@@ -14,48 +14,11 @@ async function main() {
                 const div = document.createElement("div");
                 div.className = "inline-flex w-5/6 p-4 gap-4";
 
-                const script_collapse_div = document.createElement("div");
-                if (code.split('\n').length > 1) {
-                    let new_line_pos = code.indexOf('\n');
-                    script_collapse_div.tabIndex = 0;
-                    script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
-                    const script_collapse_title_div = document.createElement("div");
-                    script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
-                    script_collapse_title_div.innerText = code.slice(0, new_line_pos);
-                    const script_collapse_content_div = document.createElement("div"); script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
-                    script_collapse_content_div.innerText = code.slice(new_line_pos);
-                    script_collapse_div.appendChild(script_collapse_title_div);
-                    script_collapse_div.appendChild(script_collapse_content_div);
-                } else {
-                    script_collapse_div.tabIndex = 0;
-                    script_collapse_div.className = "bg-base-100 border-base-300 border w-3/4 ";
-                    const script_collapse_title_div = document.createElement("div");
-                    script_collapse_title_div.className = "p-1 whitespace-pre-wrap";
-                    script_collapse_title_div.innerText = code;
-                    script_collapse_div.appendChild(script_collapse_title_div);
-                }
+                const script_collapse_div = createScriptCollapse(code);
+                const script_buttons_div = createScriptButtons(code, enabled, i);
 
-                const bdiv = document.createElement("div");
-                bdiv.className = "flex gap-4";
-                const checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.checked = enabled;
-                checkbox.className = "checkbox checkbox-primary my-auto";
-                checkbox.onclick = () => { toggleScriptEnabled(i, checkbox.checked) };
-                const edit_button = document.createElement("button");
-                edit_button.className = "btn btn-accent m-auto";
-                edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
-                edit_button.onclick = () => { editScriptMode(i, code) };
-                const delete_button = document.createElement("button");
-                delete_button.className = "btn btn-accent m-auto ";
-                delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
-                delete_button.onclick = () => { deleteScript(i) };
-
-                bdiv.appendChild(checkbox);
-                bdiv.appendChild(edit_button);
-                bdiv.appendChild(delete_button);
                 div.appendChild(script_collapse_div);
-                div.appendChild(bdiv);
+                div.appendChild(script_buttons_div);
                 list_item.appendChild(div);
                 list.appendChild(list_item);
             }
@@ -79,6 +42,58 @@ async function main() {
 }
 
 main();
+
+function createScriptButtons(code: string, enabled: boolean, script_num: number): HTMLDivElement {
+    const script_buttons_div = document.createElement("div");
+    script_buttons_div.className = "flex gap-4";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = enabled;
+    checkbox.className = "checkbox checkbox-primary my-auto";
+    checkbox.onclick = () => { toggleScriptEnabled(script_num, checkbox.checked) };
+
+    const edit_button = document.createElement("button");
+    edit_button.className = "btn btn-accent m-auto";
+    edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
+    edit_button.onclick = () => { editScriptMode(script_num, code) };
+
+    const delete_button = document.createElement("button");
+    delete_button.className = "btn btn-accent m-auto ";
+    delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
+    delete_button.onclick = () => { deleteScript(script_num) };
+
+    script_buttons_div.appendChild(checkbox);
+    script_buttons_div.appendChild(edit_button);
+    script_buttons_div.appendChild(delete_button);
+
+    return script_buttons_div;
+}
+
+function createScriptCollapse(code: string): HTMLDivElement {
+    const script_collapse_div = document.createElement("div");
+    if (code.split('\n').length > 1) {
+        let new_line_pos = code.indexOf('\n');
+        script_collapse_div.tabIndex = 0;
+        script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
+        const script_collapse_title_div = document.createElement("div");
+        script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
+        script_collapse_title_div.innerText = code.slice(0, new_line_pos);
+        const script_collapse_content_div = document.createElement("div"); script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
+        script_collapse_content_div.innerText = code.slice(new_line_pos);
+        script_collapse_div.appendChild(script_collapse_title_div);
+        script_collapse_div.appendChild(script_collapse_content_div);
+    } else {
+        script_collapse_div.tabIndex = 0;
+        script_collapse_div.className = "bg-base-100 border-base-300 border w-3/4 ";
+        const script_collapse_title_div = document.createElement("div");
+        script_collapse_title_div.className = "p-1 whitespace-pre-wrap";
+        script_collapse_title_div.innerText = code;
+        script_collapse_div.appendChild(script_collapse_title_div);
+    }
+
+    return script_collapse_div;
+}
 
 function editScriptMode(i: number, script: string) {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
