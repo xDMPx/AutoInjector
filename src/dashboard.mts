@@ -1,5 +1,5 @@
 import { Script } from "./interfaces.mjs";
-import { deleteAutoInjectorScript, disableAutoInjectorScript, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
+import { deleteAutoInjectorScript, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 async function main() {
     const scripts = await getAutoInjectorScripts();
@@ -28,7 +28,6 @@ async function main() {
 
     const submit_script = document.getElementById("submit-script")!;
     submit_script.onclick = saveScript;
-
 
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     user_script_text.oninput = () => { autoResizeTextArea() };
@@ -182,8 +181,16 @@ async function onImportScriptsClick() {
 }
 
 async function importScripts(data: string) {
+    const saved_scripts = (await getAutoInjectorScripts())?.map((s) => djb2Hash(s.code));
+    const saved_scripts_hash = new Set(saved_scripts);
+
     const scripts = JSON.parse(data) as Script[];
     for (const script of scripts) {
+        if (saved_scripts_hash.has(djb2Hash(script.code))) {
+            console.log("Duplicate script:");
+            console.log(script.code);
+            continue;
+        };
         await saveAutoInjectorScript(script.code, script.enabled);
     }
     location.reload();
