@@ -58,6 +58,11 @@ function createScriptButtons(code: string, enabled: boolean, script_num: number)
     edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
     edit_button.onclick = () => { editScriptMode(script_num, code) };
 
+    const copy_button = document.createElement("button");
+    copy_button.className = "btn btn-accent m-auto";
+    copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
+    copy_button.onclick = () => { copyScriptToClipboard(code) };
+
     const delete_button = document.createElement("button");
     delete_button.className = "btn btn-accent m-auto ";
     delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
@@ -65,6 +70,7 @@ function createScriptButtons(code: string, enabled: boolean, script_num: number)
 
     script_buttons_div.appendChild(checkbox);
     script_buttons_div.appendChild(edit_button);
+    script_buttons_div.appendChild(copy_button);
     script_buttons_div.appendChild(delete_button);
 
     return script_buttons_div;
@@ -239,4 +245,8 @@ async function importScripts(data: string) {
         location.reload();
     }
 
+}
+
+function copyScriptToClipboard(code: string) {
+    navigator.clipboard.writeText(code);
 }
