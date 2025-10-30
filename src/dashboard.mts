@@ -45,7 +45,7 @@ main();
 
 function createScriptButtons(code: string, enabled: boolean, script_num: number): HTMLDivElement {
     const script_buttons_div = document.createElement("div");
-    script_buttons_div.className = "flex gap-4";
+    script_buttons_div.className = "flex place-items-center gap-4";
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
