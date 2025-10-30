@@ -1,6 +1,10 @@
 {
-  "$schema":  "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
-  "packages": ["nodejs@latest"],
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": [
+    "nodejs@latest",
+    "web-ext@latest"
+  ],
+  "env_from": ".env",
   "shell": {
     "init_hook": [
       "echo 'Welcome to devbox!' > /dev/null"
@@ -21,6 +25,15 @@
       ],
       "audit": [
         "npm audit"
+      ],
+      "lint": [
+        "web-ext -s dist lint"
+      ],
+      "package": [
+        "set -xe",
+        "devbox run build",
+        "web-ext -s dist build --overwrite-dest",
+        "web-ext -s dist sign --channel=unlisted --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET"
       ]
     }
   }
