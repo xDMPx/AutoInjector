@@ -47,31 +47,48 @@ function createScriptButtons(code: string, enabled: boolean, script_num: number)
     const script_buttons_div = document.createElement("div");
     script_buttons_div.className = "flex place-items-center gap-4";
 
+    const checkbox_tooltip = document.createElement("div");
+    checkbox_tooltip.className = "tooltip";
+    checkbox_tooltip.setAttribute("data-tip", "Enable/disable this script");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = enabled;
     checkbox.className = "checkbox checkbox-primary my-auto";
     checkbox.onclick = () => { toggleScriptEnabled(script_num, checkbox.checked) };
+    checkbox_tooltip.appendChild(checkbox);
 
+    const edit_button_tooltip = document.createElement("div");
+    edit_button_tooltip.className = "tooltip";
+    edit_button_tooltip.setAttribute("data-tip", "Edit this script");
     const edit_button = document.createElement("button");
     edit_button.className = "btn btn-accent m-auto";
     edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
     edit_button.onclick = () => { editScriptMode(script_num, code) };
+    edit_button_tooltip.appendChild(edit_button);
 
+    const copy_button_tooltip = document.createElement("div");
+    copy_button_tooltip.className = "tooltip";
+    copy_button_tooltip.setAttribute("data-tip", "Copy to clipboard");
     const copy_button = document.createElement("button");
     copy_button.className = "btn btn-accent m-auto";
     copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
     copy_button.onclick = () => { copyScriptToClipboard(code) };
+    copy_button_tooltip.appendChild(copy_button);
+    "Permanently remove this script";
 
+    const delete_button_tooltip = document.createElement("div");
+    delete_button_tooltip.className = "tooltip";
+    delete_button_tooltip.setAttribute("data-tip", "Permanently remove this script");
     const delete_button = document.createElement("button");
     delete_button.className = "btn btn-accent m-auto ";
     delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
     delete_button.onclick = () => { deleteScript(script_num) };
+    delete_button_tooltip.appendChild(delete_button);
 
-    script_buttons_div.appendChild(checkbox);
-    script_buttons_div.appendChild(edit_button);
-    script_buttons_div.appendChild(copy_button);
-    script_buttons_div.appendChild(delete_button);
+    script_buttons_div.appendChild(checkbox_tooltip);
+    script_buttons_div.appendChild(edit_button_tooltip);
+    script_buttons_div.appendChild(copy_button_tooltip);
+    script_buttons_div.appendChild(delete_button_tooltip);
 
     return script_buttons_div;
 }
