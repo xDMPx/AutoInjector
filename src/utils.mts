@@ -16,12 +16,13 @@ export async function getAutoInjectorScripts(): Promise<Script[] | undefined> {
     return scripts;
 }
 
-export async function saveAutoInjectorScript(script: string, enabled: boolean = true) {
+export async function saveAutoInjectorScript(name: string, script: string, enabled: boolean = true) {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
     }
     scripts.push({
+        name: name,
         code: script,
         enabled: enabled
     });
@@ -37,11 +38,12 @@ export async function deleteAutoInjectorScript(i: number) {
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
-export async function editAutoInjectorScript(i: number, script: string) {
+export async function editAutoInjectorScript(i: number, name: string, script: string) {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
     }
+    scripts[i].name = name;
     scripts[i].code = script;
     await chrome.storage.local.set({ "scripts": scripts });
 }

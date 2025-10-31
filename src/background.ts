@@ -4,7 +4,7 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
     if (details.reason === "update") {
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
-            saveAutoInjectorScript("alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
+            saveAutoInjectorScript("AutoInjector Test Script", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
         }
     }
 });

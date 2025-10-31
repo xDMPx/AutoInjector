@@ -9,14 +9,17 @@ async function main() {
         const list = document.createElement("ol");
         list.className = "list-decimal list-inside p-1";
         if (scripts !== undefined) {
-            for (const [i, { code, enabled }] of scripts.entries()) {
+            for (const [i, { name, code, enabled }] of scripts.entries()) {
                 const list_item = document.createElement("li");
                 const div = document.createElement("div");
-                div.className = "inline-flex w-5/6 p-4 gap-4";
+                div.className = "inline-flex place-items-center w-5/6 p-4 gap-4";
 
+                const script_name_div = document.createElement("div");
+                script_name_div.innerText = name;
                 const script_collapse_div = createScriptCollapse(code);
-                const script_buttons_div = createScriptButtons(code, enabled, i);
+                const script_buttons_div = createScriptButtons(name, code, enabled, i);
 
+                div.appendChild(script_name_div);
                 div.appendChild(script_collapse_div);
                 div.appendChild(script_buttons_div);
                 list_item.appendChild(div);
@@ -43,7 +46,7 @@ async function main() {
 
 main();
 
-function createScriptButtons(code: string, enabled: boolean, script_num: number): HTMLDivElement {
+function createScriptButtons(name: string, code: string, enabled: boolean, script_num: number): HTMLDivElement {
     const script_buttons_div = document.createElement("div");
     script_buttons_div.className = "flex place-items-center gap-4";
 
@@ -63,7 +66,7 @@ function createScriptButtons(code: string, enabled: boolean, script_num: number)
     const edit_button = document.createElement("button");
     edit_button.className = "btn btn-accent m-auto";
     edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
-    edit_button.onclick = () => { editScriptMode(script_num, code) };
+    edit_button.onclick = () => { editScriptMode(script_num, name, code) };
     edit_button_tooltip.appendChild(edit_button);
 
     const copy_button_tooltip = document.createElement("div");
@@ -74,7 +77,6 @@ function createScriptButtons(code: string, enabled: boolean, script_num: number)
     copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
     copy_button.onclick = () => { copyScriptToClipboard(code) };
     copy_button_tooltip.appendChild(copy_button);
-    "Permanently remove this script";
 
     const delete_button_tooltip = document.createElement("div");
     delete_button_tooltip.className = "tooltip";
@@ -102,7 +104,8 @@ function createScriptCollapse(code: string): HTMLDivElement {
         const script_collapse_title_div = document.createElement("div");
         script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
         script_collapse_title_div.innerText = code.slice(0, new_line_pos);
-        const script_collapse_content_div = document.createElement("div"); script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
+        const script_collapse_content_div = document.createElement("div");
+        script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
         script_collapse_content_div.innerText = code.slice(new_line_pos);
         script_collapse_div.appendChild(script_collapse_title_div);
         script_collapse_div.appendChild(script_collapse_content_div);
@@ -118,14 +121,16 @@ function createScriptCollapse(code: string): HTMLDivElement {
     return script_collapse_div;
 }
 
-function editScriptMode(i: number, script: string) {
+function editScriptMode(i: number, name: string, script: string) {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+    const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
     const submit_script = document.getElementById("submit-script")!;
     user_script_text.style.height = 'auto';
     submit_script.textContent = "Save";
     submit_script.onclick = () => { editScript(i) };
     user_script_text.value = script;
     user_script_text.style.height = `${user_script_text.scrollHeight}px`;
+    user_script_name.value = name;
 }
 
 
@@ -165,7 +170,8 @@ function getLineIndent(line: string): string {
 
 async function saveScript() {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-    await saveAutoInjectorScript(user_script_text.value);
+    const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
+    await saveAutoInjectorScript(user_script_name.value, user_script_text.value);
     location.reload();
 }
 
@@ -184,8 +190,10 @@ async function deleteScript(i: number) {
 
 async function editScript(i: number) {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-    await editAutoInjectorScript(i, user_script_text.value);
+    const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+    await editAutoInjectorScript(i, user_script_name.value, user_script_text.value);
     user_script_text.value = "";
+    user_script_name.value = "";
     location.reload();
 }
 
@@ -243,7 +251,7 @@ async function importScripts(data: string) {
             duplicate_scripts.push(script);
             continue;
         };
-        await saveAutoInjectorScript(script.code, script.enabled);
+        await saveAutoInjectorScript(script.name, script.code, script.enabled);
     }
     if (duplicate_scripts.length > 0) {
         const import_duplicate_script_modal = document.getElementById("import_duplicate_script_modal")! as HTMLDialogElement;
@@ -252,7 +260,7 @@ async function importScripts(data: string) {
             e.preventDefault();
             if (e.submitter?.id === "import_duplicate_script_modal-yes") {
                 for (const script of duplicate_scripts) {
-                    await saveAutoInjectorScript(script.code, script.enabled);
+                    await saveAutoInjectorScript(script.name, script.code, script.enabled);
                 }
             }
             import_duplicate_script_modal.close();
