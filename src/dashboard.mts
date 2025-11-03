@@ -34,7 +34,10 @@ async function main() {
 
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     user_script_text.oninput = () => { autoResizeTextArea() };
-    user_script_text.onkeydown = autoIndentOnEnter;
+    user_script_text.onkeydown = (e) => {
+        autoIndentOnEnter(e);
+        insertTabOnTabKey(e);
+    };
     autoResizeTextArea();
 
     const export_button = document.getElementById("btn_export")!;
@@ -157,6 +160,19 @@ function autoIndentOnEnter(e: KeyboardEvent) {
     user_script_text.value = `${before}\n${indent}${after}`;
     user_script_text.selectionStart = before.length + indent.length + 1;
     user_script_text.selectionEnd = before.length + indent.length + 1;
+}
+
+function insertTabOnTabKey(e: KeyboardEvent) {
+    if (e.key !== "Tab" || e.shiftKey === true) return;
+    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+    if (user_script_text.selectionStart !== user_script_text.selectionEnd) return;
+    e.preventDefault();
+
+    const cursor_pos = user_script_text.selectionStart;
+    const before = user_script_text.value.slice(0, cursor_pos);
+    const after = user_script_text.value.slice(cursor_pos);
+
+    user_script_text.value = `${before}\t${after}`;
 
 }
 
