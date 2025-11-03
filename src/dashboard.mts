@@ -36,6 +36,7 @@ async function main() {
     user_script_text.oninput = () => { autoResizeTextArea() };
     user_script_text.onkeydown = (e) => {
         autoIndentOnEnter(e);
+        removeLastIndentOnShiftTabKey(e);
         insertTabOnTabKey(e);
     };
     autoResizeTextArea();
@@ -173,7 +174,35 @@ function insertTabOnTabKey(e: KeyboardEvent) {
     const after = user_script_text.value.slice(cursor_pos);
 
     user_script_text.value = `${before}\t${after}`;
+}
 
+function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
+    if (e.key !== "Tab" || e.shiftKey === false) return;
+    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+    if (user_script_text.selectionStart !== user_script_text.selectionEnd) return;
+    e.preventDefault();
+
+    const cursor_pos = user_script_text.selectionStart;
+    let before = user_script_text.value.slice(0, cursor_pos);
+    const after = user_script_text.value.slice(cursor_pos);
+
+    let line = before.slice(before.lastIndexOf("\n") + 1);
+    let indent = getLineIndent(line);
+    before = before.slice(0, before.length - line.length);
+    line = line.slice(indent.length);
+    if (indent.endsWith("\t")) {
+        indent = indent.slice(0, indent.length - 1);
+    } else if (indent.endsWith(" ")) {
+        let count_of_spaces = 0;
+        for (let i = indent.length - 1; i >= 0 && indent[i] === " "; i--) {
+            count_of_spaces++;
+        }
+        console.log(count_of_spaces);
+        const remove = (count_of_spaces % 4 === 0) ? 4 : count_of_spaces % 4;
+        indent = indent.slice(0, indent.length - remove);
+    }
+
+    user_script_text.value = `${before}${indent}${line}${after}`;
 }
 
 function getLineIndent(line: string): string {
