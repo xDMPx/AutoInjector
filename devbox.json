@@ -17,6 +17,9 @@
         "set -xe",
         "npx tsc",
         "npx @tailwindcss/cli -i ./src/dashboard.css -o ./dist/dashboard.css",
+        "cp ./src/Material_Symbols_Outlined.css ./dist/Material_Symbols_Outlined.css",
+        "mkdir -p ./dist/fonts",
+        "cp ./src/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf ./dist/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf",
         "cp ./manifest.json ./dist/manifest.json",
         "cp ./src/dashboard.html ./dist/dashboard.html"
       ],
