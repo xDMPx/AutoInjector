@@ -204,7 +204,8 @@ async function saveScript() {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
     await saveAutoInjectorScript(user_script_name.value, user_script_text.value);
-    location.reload();
+
+    reload();
 }
 
 async function deleteScript(i: number) {
@@ -214,7 +215,7 @@ async function deleteScript(i: number) {
         e.preventDefault();
         if (e.submitter?.id === "delete_script_modal-yes") {
             await deleteAutoInjectorScript(i);
-            location.reload();
+            reload();
         }
         delete_script_modal.close();
     };
@@ -226,7 +227,7 @@ async function editScript(i: number) {
     await editAutoInjectorScript(i, user_script_name.value, user_script_text.value);
     user_script_text.value = "";
     user_script_name.value = "";
-    location.reload();
+    reload();
 }
 
 async function toggleScriptEnabled(i: number, enabled: boolean) {
@@ -235,7 +236,7 @@ async function toggleScriptEnabled(i: number, enabled: boolean) {
     } else {
         await disableAutoInjectorScript(i);
     }
-    location.reload();
+    reload();
 }
 
 async function exportScripts() {
@@ -301,14 +302,24 @@ async function importScripts(data: string) {
                 }
             }
             import_duplicate_script_modal.close();
-            location.reload();
+            reload();
         };
     } else {
-        location.reload();
+        reload();
     }
 
 }
 
 function copyScriptToClipboard(code: string) {
     navigator.clipboard.writeText(code);
+}
+
+function reload() {
+    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+    const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
+
+    user_script_text.value = "";
+    user_script_name.value = "";
+
+    location.reload();
 }
