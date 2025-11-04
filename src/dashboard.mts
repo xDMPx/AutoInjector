@@ -7,12 +7,12 @@ async function main() {
 
     if (script_div !== null) {
         const list = document.createElement("ol");
-        list.className = "list-decimal list-inside p-1";
+        list.className = "list-decimal list-outside p-1";
         if (scripts !== undefined) {
             for (const [i, { name, code, enabled }] of scripts.entries()) {
                 const list_item = document.createElement("li");
                 const div = document.createElement("div");
-                div.className = "inline-flex place-items-center w-5/6 p-4 gap-4";
+                div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
                 const script_collapse_div = createScriptCollapse(name, code);
                 const script_buttons_div = createScriptButtons(name, code, enabled, i);
