@@ -14,12 +14,13 @@
 
 <body>
     <div class="w-3/4 mx-auto">
-        <div class="grid p-4 gap-2">
-            <input id="user-script-name" type="text" placeholder="Script name"
-                class="input w-auto outline outline-offset-[unset]" />
-            <textarea class="outline p-4" id="user-script" spellcheck="false" placeholder="JavaScript"></textarea>
+        <form id="submit-script-form" class="grid p-4 gap-2">
+            <input id="user-script-name" type="text" required placeholder="Script name"
+                class="input validator w-auto outline outline-offset-[unset]" minlength="3" />
+            <textarea required class="outline p-4" id="user-script" spellcheck="false"
+                placeholder="JavaScript"></textarea>
             <button class="btn btn-primary" id="submit-script">Submit</button>
-        </div>
+        </form>
         <div id="script-div"></div>
     </div>
     <div class="fab">

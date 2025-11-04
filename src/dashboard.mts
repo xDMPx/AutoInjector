@@ -26,8 +26,8 @@ async function main() {
         }
     }
 
-    const submit_script = document.getElementById("submit-script")!;
-    submit_script.onclick = saveScript;
+    const submit_script = document.getElementById("submit-script-form")!;
+    submit_script.onsubmit = (e) => { saveScript(e); };
 
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     user_script_text.oninput = () => { autoResizeTextArea() };
@@ -200,7 +200,8 @@ function getLineIndent(line: string): string {
     return line.slice(0, i);
 }
 
-async function saveScript() {
+async function saveScript(e: SubmitEvent) {
+    e.preventDefault();
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
     await saveAutoInjectorScript(user_script_name.value, user_script_text.value);
