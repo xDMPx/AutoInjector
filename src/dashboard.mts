@@ -2,32 +2,11 @@ import { Script } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 async function main() {
-    const scripts = await getAutoInjectorScripts();
-    const script_div = document.getElementById("script-div");
+    const script_div = document.getElementById("script-div") as HTMLDivElement;
+    script_div.appendChild(await createScriptList());
 
-    if (script_div !== null) {
-        const list = document.createElement("ol");
-        list.className = "list-decimal list-outside p-1";
-        if (scripts !== undefined) {
-            for (const [i, { name, code, enabled }] of scripts.entries()) {
-                const list_item = document.createElement("li");
-                const div = document.createElement("div");
-                div.className = "inline-flex place-items-center w-full p-4 gap-4";
-
-                const script_collapse_div = createScriptCollapse(name, code);
-                const script_buttons_div = createScriptButtons(name, code, enabled, i);
-
-                div.appendChild(script_collapse_div);
-                div.appendChild(script_buttons_div);
-                list_item.appendChild(div);
-                list.appendChild(list_item);
-            }
-            script_div.appendChild(list);
-        }
-    }
-
-    const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
-    submit_script_form.onsubmit = (e) => { saveScript(e); };
+    const submit_script = document.getElementById("submit-script-form") as HTMLFormElement;
+    submit_script.onsubmit = (e) => { saveScript(e); };
 
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     user_script_text.oninput = () => { autoResizeTextArea() };
@@ -46,6 +25,29 @@ async function main() {
 }
 
 main();
+
+async function createScriptList() {
+    const scripts = await getAutoInjectorScripts();
+    const list = document.createElement("ol");
+    list.className = "list-decimal list-outside p-1";
+    if (scripts !== undefined) {
+        for (const [i, { name, code, enabled }] of scripts.entries()) {
+            const list_item = document.createElement("li");
+            const div = document.createElement("div");
+            div.className = "inline-flex place-items-center w-full p-4 gap-4";
+
+            const script_collapse_div = createScriptCollapse(name, code);
+            const script_buttons_div = createScriptButtons(name, code, enabled, i);
+
+            div.appendChild(script_collapse_div);
+            div.appendChild(script_buttons_div);
+            list_item.appendChild(div);
+            list.appendChild(list_item);
+        }
+    }
+
+    return list;
+}
 
 function createScriptButtons(name: string, code: string, enabled: boolean, script_num: number): HTMLDivElement {
     const script_buttons_div = document.createElement("div");
@@ -230,6 +232,7 @@ async function editScript(e: SubmitEvent, i: number) {
     await editAutoInjectorScript(i, user_script_name.value, user_script_text.value);
     user_script_text.value = "";
     user_script_name.value = "";
+
     reload();
 }
 
@@ -324,5 +327,14 @@ function reload() {
     user_script_text.value = "";
     user_script_name.value = "";
 
-    location.reload();
+    const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
+    submit_script_form.reset();
+    submit_script_form.onsubmit = (e) => { saveScript(e); };
+
+    const submit_script_button = document.getElementById("submit-script") as HTMLButtonElement;
+    submit_script_button.textContent = "Submit";
+
+    const script_div = document.getElementById("script-div") as HTMLDivElement;
+    script_div.children.item(0)?.remove();
+    createScriptList().then((l) => script_div.appendChild(l))
 }
