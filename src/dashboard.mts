@@ -252,7 +252,16 @@ async function exportScripts() {
         const url = `data:application/json;base64,${btoa(scripts_json)}`;
         const a = document.createElement("a");
         a.href = url;
-        a.download = "autoinjector_scripts.json";
+
+        const date = new Date();
+        const year = date.getFullYear();
+        console.log(year);
+        const month = String(date.getMonth() + 2).padStart(2, "0");
+        console.log(month);
+        const day = date.getDate().toString().padStart(2, "0");
+        console.log(day);
+        a.download = `autoinjector_scripts_${year}_${month}_${day}.json`;
+
         a.click();
     }
 
