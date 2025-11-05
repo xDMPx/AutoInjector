@@ -26,8 +26,8 @@ async function main() {
         }
     }
 
-    const submit_script = document.getElementById("submit-script-form")!;
-    submit_script.onsubmit = (e) => { saveScript(e); };
+    const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
+    submit_script_form.onsubmit = (e) => { saveScript(e); };
 
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     user_script_text.oninput = () => { autoResizeTextArea() };
@@ -115,10 +115,11 @@ function createScriptCollapse(name: string, code: string): HTMLDivElement {
 function editScriptMode(i: number, name: string, script: string) {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
-    const submit_script = document.getElementById("submit-script")!;
+    const submit_script_button = document.getElementById("submit-script") as HTMLButtonElement;
+    const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     user_script_text.style.height = 'auto';
-    submit_script.textContent = "Save";
-    submit_script.onclick = () => { editScript(i) };
+    submit_script_button.textContent = "Save";
+    submit_script_form.onsubmit = (e) => { editScript(e, i) };
     user_script_text.value = script;
     user_script_text.style.height = `${user_script_text.scrollHeight}px`;
     user_script_name.value = name;
@@ -222,7 +223,8 @@ async function deleteScript(i: number) {
     };
 }
 
-async function editScript(i: number) {
+async function editScript(e: SubmitEvent, i: number) {
+    e.preventDefault();
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
     await editAutoInjectorScript(i, user_script_name.value, user_script_text.value);
