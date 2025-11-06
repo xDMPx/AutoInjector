@@ -31,13 +31,13 @@ async function createScriptList() {
     const list = document.createElement("ol");
     list.className = "list-decimal list-outside p-1";
     if (scripts !== undefined) {
-        for (const [i, { name, code, enabled }] of scripts.entries()) {
+        for (const [i, { name, url, code, enabled }] of scripts.entries()) {
             const list_item = document.createElement("li");
             const div = document.createElement("div");
             div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
-            const script_collapse_div = createScriptCollapse(name, code);
-            const script_buttons_div = createScriptButtons(name, code, enabled, i);
+            const script_collapse_div = createScriptCollapse(name, url, code);
+            const script_buttons_div = createScriptButtons(name, url, code, enabled, i);
 
             div.appendChild(script_collapse_div);
             div.appendChild(script_buttons_div);
@@ -49,7 +49,7 @@ async function createScriptList() {
     return list;
 }
 
-function createScriptButtons(name: string, code: string, enabled: boolean, script_num: number): HTMLDivElement {
+function createScriptButtons(name: string, url: string, code: string, enabled: boolean, script_num: number): HTMLDivElement {
     const script_buttons_div = document.createElement("div");
     script_buttons_div.className = "flex place-items-center gap-4";
 
@@ -69,7 +69,7 @@ function createScriptButtons(name: string, code: string, enabled: boolean, scrip
     const edit_button = document.createElement("button");
     edit_button.className = "btn btn-accent m-auto";
     edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
-    edit_button.onclick = () => { editScriptMode(script_num, name, code) };
+    edit_button.onclick = () => { editScriptMode(script_num, name, url, code) };
     edit_button_tooltip.appendChild(edit_button);
 
     const copy_button_tooltip = document.createElement("div");
@@ -98,13 +98,13 @@ function createScriptButtons(name: string, code: string, enabled: boolean, scrip
     return script_buttons_div;
 }
 
-function createScriptCollapse(name: string, code: string): HTMLDivElement {
+function createScriptCollapse(name: string, url: string, code: string): HTMLDivElement {
     const script_collapse_div = document.createElement("div");
     script_collapse_div.tabIndex = 0;
     script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
     const script_collapse_title_div = document.createElement("div");
     script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
-    script_collapse_title_div.innerText = name;
+    script_collapse_title_div.innerText = `${name}\nURL: ${url}`;
     const script_collapse_content_div = document.createElement("div");
     script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
     script_collapse_content_div.innerText = code;
@@ -114,9 +114,10 @@ function createScriptCollapse(name: string, code: string): HTMLDivElement {
     return script_collapse_div;
 }
 
-function editScriptMode(i: number, name: string, script: string) {
-    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+function editScriptMode(i: number, name: string, url: string, script: string) {
     const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+    const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
+    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const submit_script_button = document.getElementById("submit-script") as HTMLButtonElement;
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     user_script_text.style.height = 'auto';
@@ -125,6 +126,7 @@ function editScriptMode(i: number, name: string, script: string) {
     user_script_text.value = script;
     user_script_text.style.height = `${user_script_text.scrollHeight}px`;
     user_script_name.value = name;
+    user_script_url.value = url;
 }
 
 
@@ -207,7 +209,8 @@ async function saveScript(e: SubmitEvent) {
     e.preventDefault();
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
-    await saveAutoInjectorScript(user_script_name.value, user_script_text.value);
+    const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
+    await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value);
 
     reload();
 }
@@ -229,9 +232,11 @@ async function editScript(e: SubmitEvent, i: number) {
     e.preventDefault();
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
-    await editAutoInjectorScript(i, user_script_name.value, user_script_text.value);
+    const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
+    await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value);
     user_script_text.value = "";
     user_script_name.value = "";
+    user_script_url.value = "*";
 
     reload();
 }
@@ -290,11 +295,11 @@ async function importScripts(data: string) {
     const saved_scripts = (await getAutoInjectorScripts())?.map((s) => djb2Hash(s.code));
     const saved_scripts_hash = new Set(saved_scripts);
 
-    const imported_scripts = JSON.parse(data) as { name: string | undefined, code: string, enabled: boolean }[];
+    const imported_scripts = JSON.parse(data) as { name: string | undefined, url: string, code: string, enabled: boolean }[];
     let i = (saved_scripts === undefined) ? 0 : saved_scripts.length + 1;
     const scripts: Script[] = imported_scripts.map((s) => {
         if (s.name === undefined) s.name = `Script ${i++}`;
-        return { name: s.name, code: s.code, enabled: s.enabled };
+        return { name: s.name, url: s.url, code: s.code, enabled: s.enabled };
     });
     const duplicate_scripts: Script[] = [];
     for (const script of scripts) {
@@ -304,7 +309,7 @@ async function importScripts(data: string) {
             duplicate_scripts.push(script);
             continue;
         };
-        await saveAutoInjectorScript(script.name, script.code, script.enabled);
+        await saveAutoInjectorScript(script.name, script.url, script.code, script.enabled);
     }
     if (duplicate_scripts.length > 0) {
         const import_duplicate_script_modal = document.getElementById("import_duplicate_script_modal")! as HTMLDialogElement;
@@ -313,7 +318,7 @@ async function importScripts(data: string) {
             e.preventDefault();
             if (e.submitter?.id === "import_duplicate_script_modal-yes") {
                 for (const script of duplicate_scripts) {
-                    await saveAutoInjectorScript(script.name, script.code, script.enabled);
+                    await saveAutoInjectorScript(script.name, script.url, script.code, script.enabled);
                 }
             }
             import_duplicate_script_modal.close();
@@ -330,11 +335,13 @@ function copyScriptToClipboard(code: string) {
 }
 
 function reload() {
+    const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
 
     user_script_text.value = "";
     user_script_name.value = "";
+    user_script_url.value = "*";
 
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     submit_script_form.reset();

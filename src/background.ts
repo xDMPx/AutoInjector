@@ -5,7 +5,7 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
         await migrateFrom010To020();
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
-            saveAutoInjectorScript("AutoInjector Test Script", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
+            saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
         }
     }
 });
@@ -28,7 +28,11 @@ chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {
 chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedInfo) => {
     const scripts = await getAutoInjectorScripts();
     if (scripts === undefined) return;
-    for (const code of scripts.filter((s) => s.enabled).map((s) => s.code)) {
+    const tab = await chrome.tabs.get(activeInfo.tabId);
+    let tab_url = tab.url || tab.pendingUrl;
+    if (tab_url === undefined) return;
+    for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
+        if (url !== "*" && !tab_url.startsWith(url)) continue;
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
             args: [code, djb2Hash(code)],
@@ -43,7 +47,11 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
     if (updateinfo.status === chrome.tabs.TabStatus.COMPLETE) {
         const scripts = await getAutoInjectorScripts();
         if (scripts === undefined) return;
-        for (const code of scripts.filter((s) => s.enabled).map((s) => s.code)) {
+        const tab = await chrome.tabs.get(tabId);
+        let tab_url = tab.url || tab.pendingUrl;
+        if (tab_url === undefined) return;
+        for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
+            if (url !== "*" && !tab_url.startsWith(url)) continue;
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 args: [code, djb2Hash(code)],
