@@ -41,7 +41,9 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     let tab_url = tab.url || tab.pendingUrl;
     if (tab_url === undefined) return;
     for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
-        if (url !== "*" && !tab_url.startsWith(url)) continue;
+        const index_of_asterisk = url.indexOf("*");
+        if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
+            && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) continue;
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
             args: [code, djb2Hash(code)],
@@ -60,7 +62,9 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         let tab_url = tab.url || tab.pendingUrl;
         if (tab_url === undefined) return;
         for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
-            if (url !== "*" && !tab_url.startsWith(url)) continue;
+            const index_of_asterisk = url.indexOf("*");
+            if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
+                && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) continue;
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 args: [code, djb2Hash(code)],
