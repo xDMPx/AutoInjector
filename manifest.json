@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "AutoInjector",
     "description": "Automatic injection of scripts and CSS",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "background": {
         "scripts": ["background.js"],
         "service_worker": "background.js",

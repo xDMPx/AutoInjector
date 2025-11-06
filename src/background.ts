@@ -3,6 +3,7 @@ import { djb2Hash, getAutoInjectorScripts, saveAutoInjectorScript } from "./util
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
     if (details.reason === "update") {
         await migrateFrom010To020();
+        await migrateFrom020To021();
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
             saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
@@ -15,6 +16,14 @@ async function migrateFrom010To020() {
     if (scripts === undefined) return;
     let i = 0;
     const migrated_scripts = scripts.map((s) => { if (s.name === undefined) s.name = `Script ${i++}`; return s; });
+    await chrome.storage.local.remove("scripts");
+    await chrome.storage.local.set({ "scripts": migrated_scripts });
+}
+
+async function migrateFrom020To021() {
+    const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: { name: string, url: string | undefined, code: string, enabled: boolean }[] | undefined };
+    if (scripts === undefined) return;
+    const migrated_scripts = scripts.map((s) => { if (s.url === undefined) s.url = "*"; return s; });
     await chrome.storage.local.remove("scripts");
     await chrome.storage.local.set({ "scripts": migrated_scripts });
 }

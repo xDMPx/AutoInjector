@@ -295,10 +295,11 @@ async function importScripts(data: string) {
     const saved_scripts = (await getAutoInjectorScripts())?.map((s) => djb2Hash(s.code));
     const saved_scripts_hash = new Set(saved_scripts);
 
-    const imported_scripts = JSON.parse(data) as { name: string | undefined, url: string, code: string, enabled: boolean }[];
+    const imported_scripts = JSON.parse(data) as { name: string | undefined, url: string | undefined, code: string, enabled: boolean }[];
     let i = (saved_scripts === undefined) ? 0 : saved_scripts.length + 1;
     const scripts: Script[] = imported_scripts.map((s) => {
         if (s.name === undefined) s.name = `Script ${i++}`;
+        if (s.url === undefined) s.url = "*";
         return { name: s.name, url: s.url, code: s.code, enabled: s.enabled };
     });
     const duplicate_scripts: Script[] = [];
