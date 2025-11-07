@@ -166,6 +166,9 @@ function insertTabOnTabKey(e: KeyboardEvent) {
     const after = user_script_text.value.slice(cursor_pos);
 
     user_script_text.value = `${before}\t${after}`;
+
+    user_script_text.selectionStart = cursor_pos + 1;
+    user_script_text.selectionEnd = cursor_pos + 1;
 }
 
 function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
@@ -182,8 +185,10 @@ function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
     let indent = getLineIndent(line);
     before = before.slice(0, before.length - line.length);
     line = line.slice(indent.length);
+    let symbols_removed = 0;
     if (indent.endsWith("\t")) {
         indent = indent.slice(0, indent.length - 1);
+        symbols_removed = 1;
     } else if (indent.endsWith(" ")) {
         let count_of_spaces = 0;
         for (let i = indent.length - 1; i >= 0 && indent[i] === " "; i--) {
@@ -192,9 +197,12 @@ function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
         console.log(count_of_spaces);
         const remove = (count_of_spaces % 4 === 0) ? 4 : count_of_spaces % 4;
         indent = indent.slice(0, indent.length - remove);
+        symbols_removed = remove;
     }
 
     user_script_text.value = `${before}${indent}${line}${after}`;
+    user_script_text.selectionStart = cursor_pos - symbols_removed;
+    user_script_text.selectionEnd = cursor_pos - symbols_removed;
 }
 
 function getLineIndent(line: string): string {
