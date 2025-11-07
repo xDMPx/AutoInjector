@@ -21,7 +21,9 @@
             </label>
             <label class="input w-auto outline outline-offset-[unset]">
                 <span class="label whitespace-pre pr-6">URL</span>
-                <input id="user-script-url" type="text" required placeholder="URL" value="*" />
+                <input id="user-script-url" type="text" required class="validator" placeholder="URL" value="*"
+                    pattern="^[^*]*\*?$" />
+                <div class="validator-hint">Only one wildcard allowed at the end</div>
             </label>
             <textarea required class="outline p-4" id="user-script" spellcheck="false"
                 placeholder="JavaScript"></textarea>
