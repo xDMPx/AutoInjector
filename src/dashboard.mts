@@ -78,7 +78,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     const copy_button = document.createElement("button");
     copy_button.className = "btn btn-accent m-auto";
     copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
-    copy_button.onclick = () => { copyScriptToClipboard(code) };
+    copy_button.onclick = () => { copyScriptToClipboard(copy_button_tooltip, copy_button, code) };
     copy_button_tooltip.appendChild(copy_button);
 
     const delete_button_tooltip = document.createElement("div");
@@ -331,7 +331,13 @@ async function importScripts(data: string) {
 
 }
 
-function copyScriptToClipboard(code: string) {
+function copyScriptToClipboard(copy_button_tooltip: HTMLDivElement, copy_button: HTMLButtonElement, code: string) {
+    copy_button_tooltip.setAttribute("data-tip", "Copied!");
+    copy_button.innerHTML = "<span class=\"material-symbols-outlined\">check</span>";
+    setTimeout(() => {
+        copy_button_tooltip.setAttribute("data-tip", "Copy to clipboard");
+        copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
+    }, 250);
     navigator.clipboard.writeText(code);
 }
 
