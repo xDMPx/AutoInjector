@@ -42,6 +42,9 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     if (tab_url === undefined) return;
     for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
         const index_of_asterisk = url.indexOf("*");
+        if (!url.startsWith("https://") && !url.startsWith("http://")) {
+            tab_url = tab_url.replace("https://", "").replace("http://", "")
+        }
         if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
             && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) continue;
         await chrome.scripting.executeScript({
@@ -63,6 +66,9 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         if (tab_url === undefined) return;
         for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
             const index_of_asterisk = url.indexOf("*");
+            if (!url.startsWith("https://") && !url.startsWith("http://")) {
+                tab_url = tab_url.replace("https://", "").replace("http://", "")
+            }
             if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
                 && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) continue;
             await chrome.scripting.executeScript({
