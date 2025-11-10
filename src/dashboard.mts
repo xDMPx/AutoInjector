@@ -220,6 +220,7 @@ async function saveScript(e: SubmitEvent) {
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
     await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value);
 
+    shortToast("Script saved successfully!");
     reload();
 }
 
@@ -230,6 +231,8 @@ async function deleteScript(i: number) {
         e.preventDefault();
         if (e.submitter?.id === "delete_script_modal-yes") {
             await deleteAutoInjectorScript(i);
+
+            shortToast("Script removed successfully!");
             reload();
         }
         delete_script_modal.close();
@@ -246,6 +249,7 @@ async function editScript(e: SubmitEvent, i: number) {
     user_script_name.value = "";
     user_script_url.value = "*";
 
+    shortToast("Script updated successfully!");
     reload();
 }
 
@@ -311,6 +315,7 @@ async function importScripts(data: string) {
         return { name: s.name, url: s.url, code: s.code, enabled: s.enabled };
     });
     const duplicate_scripts: Script[] = [];
+    let imported_scripts_count = 0;
     for (const script of scripts) {
         if (saved_scripts_hash.has(djb2Hash(script.code))) {
             console.log("Duplicate script:");
@@ -318,6 +323,7 @@ async function importScripts(data: string) {
             duplicate_scripts.push(script);
             continue;
         };
+        imported_scripts_count++;
         await saveAutoInjectorScript(script.name, script.url, script.code, script.enabled);
     }
     if (duplicate_scripts.length > 0) {
@@ -327,13 +333,17 @@ async function importScripts(data: string) {
             e.preventDefault();
             if (e.submitter?.id === "import_duplicate_script_modal-yes") {
                 for (const script of duplicate_scripts) {
+                    imported_scripts_count++;
                     await saveAutoInjectorScript(script.name, script.url, script.code, script.enabled);
                 }
             }
             import_duplicate_script_modal.close();
+
+            shortToast(`Imported ${imported_scripts_count} script${imported_scripts_count > 1 ? 's' : ''} successfully!`);
             reload();
         };
     } else {
+        shortToast(`Imported ${imported_scripts_count} script${imported_scripts_count > 1 ? 's' : ''} successfully!`);
         reload();
     }
 
@@ -368,4 +378,15 @@ function reload() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
     script_div.children.item(0)?.remove();
     createScriptList().then((l) => script_div.appendChild(l))
+}
+
+function shortToast(msg: string) {
+    const toast = document.getElementById("toast")!;
+    toast.style.display = "block";
+    const toast_msg = document.getElementById("toast-text")!;
+    toast_msg.innerText = msg;
+    setTimeout(() => {
+        const toast = document.getElementById("toast")!;
+        toast.style.display = "none";
+    }, 300);
 }
