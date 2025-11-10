@@ -1,4 +1,4 @@
-import { djb2Hash, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
+import { djb2Hash, canScriptRun, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
     if (details.reason === "update") {
@@ -40,13 +40,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     const tab = await chrome.tabs.get(activeInfo.tabId);
     let tab_url = tab.url || tab.pendingUrl;
     if (tab_url === undefined) return;
-    for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
-        const index_of_asterisk = url.indexOf("*");
-        if (!url.startsWith("https://") && !url.startsWith("http://")) {
-            tab_url = tab_url.replace("https://", "").replace("http://", "")
-        }
-        if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
-            && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) continue;
+    for (const { code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { code: s.code } })) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
             args: [code, djb2Hash(code)],
@@ -64,13 +58,7 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         const tab = await chrome.tabs.get(tabId);
         let tab_url = tab.url || tab.pendingUrl;
         if (tab_url === undefined) return;
-        for (const { url, code } of scripts.filter((s) => s.enabled).map((s) => { return { code: s.code, url: s.url } })) {
-            const index_of_asterisk = url.indexOf("*");
-            if (!url.startsWith("https://") && !url.startsWith("http://")) {
-                tab_url = tab_url.replace("https://", "").replace("http://", "")
-            }
-            if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
-                && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) continue;
+        for (const { code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { code: s.code } })) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 args: [code, djb2Hash(code)],

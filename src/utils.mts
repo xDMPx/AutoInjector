@@ -11,6 +11,22 @@ export function djb2Hash(str: string): number {
     return hash >>> 0;
 }
 
+export function canScriptRun(script: Script, tab_url: string): boolean {
+    if (!script.enabled) return false;
+
+    const url = script.url;
+    const index_of_asterisk = url.indexOf("*");
+
+    if (!url.startsWith("https://") && !url.startsWith("http://")) {
+        tab_url = tab_url.replace("https://", "").replace("http://", "")
+    }
+
+    if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
+        && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) return false;
+
+    return true;
+}
+
 export async function getAutoInjectorScripts(): Promise<Script[] | undefined> {
     const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     return scripts;
