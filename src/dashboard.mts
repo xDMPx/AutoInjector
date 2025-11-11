@@ -22,6 +22,13 @@ async function main() {
 
     const import_button = document.getElementById("btn_import")!;
     import_button.onclick = onImportScriptsClick;
+
+    const about_button = document.getElementById("btn_about")!;
+    about_button.onclick = () => {
+        const about_modal = document.getElementById("about_modal")! as HTMLDialogElement;
+        about_modal.showModal();
+    };
+
 }
 
 main();
