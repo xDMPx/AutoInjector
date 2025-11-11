@@ -87,7 +87,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     const delete_button = document.createElement("button");
     delete_button.className = "btn btn-accent m-auto ";
     delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
-    delete_button.onclick = () => { deleteScript(script_num) };
+    delete_button.onclick = () => { deleteScript(script_num, name) };
     delete_button_tooltip.appendChild(delete_button);
 
     script_buttons_div.appendChild(checkbox_tooltip);
@@ -220,11 +220,11 @@ async function saveScript(e: SubmitEvent) {
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
     await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value);
 
-    shortToast("Script saved successfully!");
+    shortToast(`Script "${user_script_name.value}" saved successfully!"`);
     reload();
 }
 
-async function deleteScript(i: number) {
+async function deleteScript(i: number, name: string) {
     const delete_script_modal = document.getElementById("delete_script_modal")! as HTMLDialogElement;
     delete_script_modal.showModal();
     delete_script_modal.onsubmit = async (e) => {
@@ -232,7 +232,7 @@ async function deleteScript(i: number) {
         if (e.submitter?.id === "delete_script_modal-yes") {
             await deleteAutoInjectorScript(i);
 
-            shortToast("Script removed successfully!");
+            shortToast(`Script "${name}" removed successfully!`);
             reload();
         }
         delete_script_modal.close();
@@ -244,12 +244,13 @@ async function editScript(e: SubmitEvent, i: number) {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
+    const name = user_script_name.value;
     await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value);
     user_script_text.value = "";
     user_script_name.value = "";
     user_script_url.value = "*";
 
-    shortToast("Script updated successfully!");
+    shortToast(`Script "${name}" updated successfully!`);
     reload();
 }
 
@@ -330,16 +331,18 @@ async function importScripts(data: string) {
         const import_duplicate_script_modal = document.getElementById("import_duplicate_script_modal")! as HTMLDialogElement;
         import_duplicate_script_modal.showModal();
         import_duplicate_script_modal.onsubmit = async (e) => {
+            let duplicate_scripts_count = 0;
             e.preventDefault();
             if (e.submitter?.id === "import_duplicate_script_modal-yes") {
                 for (const script of duplicate_scripts) {
                     imported_scripts_count++;
+                    duplicate_scripts_count++;
                     await saveAutoInjectorScript(script.name, script.url, script.code, script.enabled);
                 }
             }
             import_duplicate_script_modal.close();
 
-            shortToast(`Imported ${imported_scripts_count} script${imported_scripts_count > 1 ? 's' : ''} successfully!`);
+            shortToast(`Imported ${imported_scripts_count} script${imported_scripts_count > 1 ? 's' : ''}(${duplicate_scripts_count} duplicate${duplicate_scripts_count > 1 ? 's' : ''}) successfully!`);
             reload();
         };
     } else {
