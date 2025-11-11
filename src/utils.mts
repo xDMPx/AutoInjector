@@ -14,11 +14,18 @@ export function djb2Hash(str: string): number {
 export function canScriptRun(script: Script, tab_url: string): boolean {
     if (!script.enabled) return false;
 
-    const url = script.url;
+    let url = script.url;
     const index_of_asterisk = url.indexOf("*");
 
     if (!url.startsWith("https://") && !url.startsWith("http://")) {
         tab_url = tab_url.replace("https://", "").replace("http://", "")
+    }
+
+    if (url.endsWith("/")) {
+        url = url.slice(0, url.length - 1);
+    }
+    if (tab_url.endsWith("/")) {
+        tab_url = tab_url.slice(0, tab_url.length - 1);
     }
 
     if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
