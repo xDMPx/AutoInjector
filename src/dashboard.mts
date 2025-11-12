@@ -29,6 +29,12 @@ async function main() {
         about_modal.showModal();
     };
 
+    const about_name_text = document.getElementById("about-name_text")!;
+    about_name_text.innerText = `${chrome.runtime.getManifest().name}`;
+    const about_description_text = document.getElementById("about-description_text")!;
+    about_description_text.innerText = `${chrome.runtime.getManifest().description}`;
+    const about_version_text = document.getElementById("about-version_text")!;
+    about_version_text.innerText = `Version v${chrome.runtime.getManifest().version}`;
 }
 
 main();
