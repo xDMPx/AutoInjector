@@ -21,7 +21,8 @@
         "mkdir -p ./dist/fonts",
         "cp ./src/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf ./dist/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf",
         "cp ./manifest.json ./dist/manifest.json",
-        "cp ./src/dashboard.html ./dist/dashboard.html"
+        "cp ./src/dashboard.html ./dist/dashboard.html",
+        "cp ./src/options.html ./dist/options.html"
       ],
       "update": [
         "npm update"

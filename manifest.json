@@ -20,6 +20,9 @@
     "action": {
         "default_title": "Click to open dashboard"
     },
+    "options_ui": {
+        "page": "options.html"
+    },
     "browser_specific_settings": {
         "gecko": {
             "id": "{632c8b71-85ce-4941-983f-3aac02d58830}"
