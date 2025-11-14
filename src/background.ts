@@ -1,9 +1,11 @@
-import { djb2Hash, canScriptRun, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
+import { AutoInjectorOptions } from "./interfaces.mjs";
+import { djb2Hash, canScriptRun, getAutoInjectorScripts, saveAutoInjectorScript, setAutoInjectorOptions } from "./utils.mjs";
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
     if (details.reason === "update") {
         await migrateFrom010To020();
         await migrateFrom020To021();
+        await migrateFrom021To022();
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
             saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
@@ -26,6 +28,16 @@ async function migrateFrom020To021() {
     const migrated_scripts = scripts.map((s) => { if (s.url === undefined) s.url = "*"; return s; });
     await chrome.storage.local.remove("scripts");
     await chrome.storage.local.set({ "scripts": migrated_scripts });
+}
+
+async function migrateFrom021To022() {
+    let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions | undefined };
+    if (ai_options === undefined) {
+        ai_options = {
+            confirmation_dialog_remove: true
+        }
+        setAutoInjectorOptions(ai_options);
+    }
 }
 
 chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {

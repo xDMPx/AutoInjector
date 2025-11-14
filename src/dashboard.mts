@@ -239,7 +239,7 @@ async function saveScript(e: SubmitEvent) {
 
 async function deleteScript(i: number, name: string) {
     const options = await getAutoInjectorOptions();
-    if (options?.confirmation_dialog_remove) {
+    if (options.confirmation_dialog_remove) {
         const delete_script_modal = document.getElementById("delete_script_modal")! as HTMLDialogElement;
         delete_script_modal.showModal();
         delete_script_modal.onsubmit = async (e) => {

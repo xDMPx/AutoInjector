@@ -91,11 +91,9 @@ export async function disableAutoInjectorScript(i: number) {
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
-export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions | undefined> {
+export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions> {
     let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions | undefined };
 
-    console.log("utils");
-    console.log(ai_options);
     if (ai_options === undefined) {
         ai_options = {
             confirmation_dialog_remove: true
@@ -103,4 +101,8 @@ export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions | un
     }
 
     return ai_options;
+}
+
+export async function setAutoInjectorOptions(ai_options: AutoInjectorOptions) {
+    await chrome.storage.local.set({ "ai_options": ai_options });
 }
