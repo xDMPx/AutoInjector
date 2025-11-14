@@ -1,4 +1,4 @@
-import { Script } from "./interfaces.mjs";
+import { Script, AutoInjectorOptions } from "./interfaces.mjs";
 
 // http://www.cse.yorku.ca/~oz/hash.html
 export function djb2Hash(str: string): number {
@@ -89,4 +89,18 @@ export async function disableAutoInjectorScript(i: number) {
     }
     scripts[i].enabled = false;
     await chrome.storage.local.set({ "scripts": scripts });
+}
+
+export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions | undefined> {
+    let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions | undefined };
+
+    console.log("utils");
+    console.log(ai_options);
+    if (ai_options === undefined) {
+        ai_options = {
+            confirmation_dialog_remove: true
+        }
+    }
+
+    return ai_options;
 }

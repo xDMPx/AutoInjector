@@ -1,5 +1,5 @@
 import { Script } from "./interfaces.mjs";
-import { deleteAutoInjectorScript, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
+import { deleteAutoInjectorScript, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -238,18 +238,25 @@ async function saveScript(e: SubmitEvent) {
 }
 
 async function deleteScript(i: number, name: string) {
-    const delete_script_modal = document.getElementById("delete_script_modal")! as HTMLDialogElement;
-    delete_script_modal.showModal();
-    delete_script_modal.onsubmit = async (e) => {
-        e.preventDefault();
-        if (e.submitter?.id === "delete_script_modal-yes") {
-            await deleteAutoInjectorScript(i);
+    const options = await getAutoInjectorOptions();
+    if (options?.confirmation_dialog_remove) {
+        const delete_script_modal = document.getElementById("delete_script_modal")! as HTMLDialogElement;
+        delete_script_modal.showModal();
+        delete_script_modal.onsubmit = async (e) => {
+            e.preventDefault();
+            if (e.submitter?.id === "delete_script_modal-yes") {
+                await deleteAutoInjectorScript(i);
 
-            shortToast(`Script "${name}" removed successfully!`);
-            reload();
-        }
-        delete_script_modal.close();
-    };
+                shortToast(`Script "${name}" removed successfully!`);
+                reload();
+            }
+            delete_script_modal.close();
+        };
+    } else {
+        await deleteAutoInjectorScript(i);
+        shortToast(`Script "${name}" removed successfully!`);
+        reload();
+    }
 }
 
 async function editScript(e: SubmitEvent, i: number) {

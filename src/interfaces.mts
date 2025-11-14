@@ -4,3 +4,7 @@ export interface Script {
     code: string,
     enabled: boolean
 }
+
+export interface AutoInjectorOptions {
+    confirmation_dialog_remove: boolean
+}
