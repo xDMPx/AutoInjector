@@ -23,6 +23,11 @@ async function main() {
     const import_button = document.getElementById("btn_import")!;
     import_button.onclick = onImportScriptsClick;
 
+    const options_button = document.getElementById("btn_options")!;
+    options_button.onclick = () => {
+        chrome.runtime.openOptionsPage();
+    }
+
     const about_button = document.getElementById("btn_about")!;
     about_button.onclick = () => {
         const about_modal = document.getElementById("about_modal")! as HTMLDialogElement;
