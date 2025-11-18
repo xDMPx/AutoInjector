@@ -34,7 +34,8 @@ async function migrateFrom021To022() {
     let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions | undefined };
     if (ai_options === undefined) {
         ai_options = {
-            confirmation_dialog_remove: true
+            confirmation_dialog_remove: true,
+            confirmation_dialog_edit: false
         }
         setAutoInjectorOptions(ai_options);
     }

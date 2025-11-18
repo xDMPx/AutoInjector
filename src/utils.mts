@@ -96,7 +96,8 @@ export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions> {
 
     if (ai_options === undefined) {
         ai_options = {
-            confirmation_dialog_remove: true
+            confirmation_dialog_remove: false,
+            confirmation_dialog_edit: true
         }
     }
 

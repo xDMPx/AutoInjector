@@ -7,4 +7,5 @@ export interface Script {
 
 export interface AutoInjectorOptions {
     confirmation_dialog_remove: boolean
+    confirmation_dialog_edit: boolean
 }

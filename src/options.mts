@@ -10,6 +10,14 @@ async function main() {
         auto_injector_options.confirmation_dialog_remove = confirmation_dialog_remove_checkbox.checked;
         setAutoInjectorOptions(auto_injector_options);
     };
+    const edit_dialog_remove_checkbox = document.getElementById("edit_dialog_remove_checkbox") as HTMLInputElement;
+    edit_dialog_remove_checkbox.checked = auto_injector_options.confirmation_dialog_edit;
+    edit_dialog_remove_checkbox.onclick = async () => {
+        const auto_injector_options = (await getAutoInjectorOptions())!;
+        const edit_dialog_remove_checkbox = document.getElementById("edit_dialog_remove_checkbox") as HTMLInputElement;
+        auto_injector_options.confirmation_dialog_edit = edit_dialog_remove_checkbox.checked;
+        setAutoInjectorOptions(auto_injector_options);
+    };
 }
 
 main();

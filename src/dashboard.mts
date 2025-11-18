@@ -266,17 +266,40 @@ async function deleteScript(i: number, name: string) {
 
 async function editScript(e: SubmitEvent, i: number) {
     e.preventDefault();
-    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-    const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
-    const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
-    const name = user_script_name.value;
-    await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value);
-    user_script_text.value = "";
-    user_script_name.value = "";
-    user_script_url.value = "*";
+    const options = await getAutoInjectorOptions();
+    if (options.confirmation_dialog_edit) {
+        const edit_script_modal = document.getElementById("edit_script_modal")! as HTMLDialogElement;
+        edit_script_modal.showModal();
+        edit_script_modal.onsubmit = async (e) => {
+            e.preventDefault();
+            if (e.submitter?.id === "edit_script_modal-yes") {
+                const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+                const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+                const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
+                const name = user_script_name.value;
+                await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value);
+                user_script_text.value = "";
+                user_script_name.value = "";
+                user_script_url.value = "*";
 
-    shortToast(`Script "${name}" updated successfully!`);
-    reload();
+                shortToast(`Script "${name}" updated successfully!`);
+                reload();
+            }
+            edit_script_modal.close();
+        };
+    } else {
+        const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+        const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+        const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
+        const name = user_script_name.value;
+        await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value);
+        user_script_text.value = "";
+        user_script_name.value = "";
+        user_script_url.value = "*";
+
+        shortToast(`Script "${name}" updated successfully!`);
+        reload();
+    }
 }
 
 async function toggleScriptEnabled(i: number, enabled: boolean) {

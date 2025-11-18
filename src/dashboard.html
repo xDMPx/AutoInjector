@@ -97,6 +97,28 @@
     </form>
 </dialog>
 
+<dialog id="edit_script_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg text-center">
+            Are you sure you want to edit this script? <br>
+            This action cannot be undone.
+        </h3>
+        <form>
+            <div class="flex justify-center p-4 gap-4">
+                <div class="form-control">
+                    <button id="edit_script_modal-yes" class="btn btn-primary">Yes</button>
+                </div>
+                <form method="dialog">
+                    <button id="edit_script_modal-no" class="btn btn-neutral">No</button>
+                </form>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
 <dialog id="import_duplicate_script_modal" class="modal">
     <div class="modal-box">
         <h3 class="font-bold text-lg text-center">
