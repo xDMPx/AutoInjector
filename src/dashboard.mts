@@ -9,11 +9,16 @@ async function main() {
     submit_script.onsubmit = (e) => { saveScript(e); };
 
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+    let overwrite_tab_behaviour = false;
+    user_script_text.onfocus = () => { overwrite_tab_behaviour = true; };
     user_script_text.oninput = () => { autoResizeTextArea() };
     user_script_text.onkeydown = (e) => {
+        if (e.key === "Escape") overwrite_tab_behaviour = false;
         autoIndentOnEnter(e);
-        removeLastIndentOnShiftTabKey(e);
-        insertTabOnTabKey(e);
+        if (overwrite_tab_behaviour) {
+            removeLastIndentOnShiftTabKey(e);
+            insertTabOnTabKey(e);
+        }
     };
     autoResizeTextArea();
 
