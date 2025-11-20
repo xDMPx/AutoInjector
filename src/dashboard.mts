@@ -126,10 +126,10 @@ function createScriptCollapse(name: string, url: string, code: string): HTMLDivE
     script_collapse_div.tabIndex = 0;
     script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
     const script_collapse_title_div = document.createElement("div");
-    script_collapse_title_div.className = "collapse-title whitespace-pre-wrap";
+    script_collapse_title_div.className = "collapse-title whitespace-pre-wrap break-all";
     script_collapse_title_div.innerText = `${name}\nURL: ${url}`;
     const script_collapse_content_div = document.createElement("div");
-    script_collapse_content_div.className = "collapse-content whitespace-pre-wrap";
+    script_collapse_content_div.className = "collapse-content whitespace-pre-wrap break-all";
     script_collapse_content_div.innerText = code;
     script_collapse_div.appendChild(script_collapse_title_div);
     script_collapse_div.appendChild(script_collapse_content_div);
