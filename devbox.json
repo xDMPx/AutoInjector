@@ -18,8 +18,10 @@
         "npx tsc",
         "npx @tailwindcss/cli -i ./src/dashboard.css -o ./dist/dashboard.css",
         "cp ./src/Material_Symbols_Outlined.css ./dist/Material_Symbols_Outlined.css",
+        "cp ./src/Fira_Code_Nerd_Font.css ./dist/Fira_Code_Nerd_Font.css",
         "mkdir -p ./dist/fonts",
-        "cp ./src/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf ./dist/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf",
+        "cp ./src/fonts/MaterialSymbolsOutlined/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf ./dist/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf",
+        "cp ./src/fonts/FiraCodeNerdFont/FiraCodeNerdFont-Regular.ttf ./dist/fonts/FiraCodeNerdFont-Regular.ttf",
         "cp ./manifest.json ./dist/manifest.json",
         "cp ./src/dashboard.html ./dist/dashboard.html",
         "cp ./src/options.html ./dist/options.html"
