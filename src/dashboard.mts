@@ -10,14 +10,26 @@ async function main() {
 
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     let overwrite_tab_behaviour = false;
-    user_script_text.onfocus = () => { overwrite_tab_behaviour = true; };
-    user_script_text.oninput = () => { autoResizeTextArea() };
+    let options = await getAutoInjectorOptions();
+    user_script_text.onfocus = () => {
+        overwrite_tab_behaviour = true;
+        getAutoInjectorOptions().then((o) => options = o);
+    };
+    user_script_text.oninput = () => {
+        autoResizeTextArea()
+        getAutoInjectorOptions().then((o) => options = o);
+    };
     user_script_text.onkeydown = (e) => {
+        getAutoInjectorOptions().then((o) => options = o);
         if (e.key === "Escape") overwrite_tab_behaviour = false;
         autoIndentOnEnter(e);
         if (overwrite_tab_behaviour) {
-            removeLastIndentOnShiftTabKey(e);
-            insertTabOnTabKey(e);
+            if (options.enable_remove_indent_shift_tab) {
+                removeLastIndentOnShiftTabKey(e);
+            }
+            if (options.enable_insert_tab_on_tab) {
+                insertTabOnTabKey(e);
+            }
         }
     };
     autoResizeTextArea();

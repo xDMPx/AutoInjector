@@ -18,6 +18,22 @@ async function main() {
         auto_injector_options.confirmation_dialog_edit = edit_dialog_remove_checkbox.checked;
         setAutoInjectorOptions(auto_injector_options);
     };
+    const enable_remove_indent_shift_tab_checkbox = document.getElementById("enable_remove_indent_shift_tab_checkbox") as HTMLInputElement;
+    enable_remove_indent_shift_tab_checkbox.checked = auto_injector_options.enable_remove_indent_shift_tab;
+    enable_remove_indent_shift_tab_checkbox.onclick = async () => {
+        const auto_injector_options = (await getAutoInjectorOptions())!;
+        const enable_remove_indent_shift_tab_checkbox = document.getElementById("enable_remove_indent_shift_tab_checkbox") as HTMLInputElement;
+        auto_injector_options.enable_remove_indent_shift_tab = enable_remove_indent_shift_tab_checkbox.checked;
+        setAutoInjectorOptions(auto_injector_options);
+    };
+    const enable_insert_tab_on_tab_checkbox = document.getElementById("enable_insert_tab_on_tab_checkbox") as HTMLInputElement;
+    enable_insert_tab_on_tab_checkbox.checked = auto_injector_options.enable_insert_tab_on_tab;
+    enable_insert_tab_on_tab_checkbox.onclick = async () => {
+        const auto_injector_options = (await getAutoInjectorOptions())!;
+        const enable_insert_tab_on_tab_checkbox = document.getElementById("enable_insert_tab_on_tab_checkbox") as HTMLInputElement;
+        auto_injector_options.enable_insert_tab_on_tab = enable_insert_tab_on_tab_checkbox.checked;
+        setAutoInjectorOptions(auto_injector_options);
+    };
 }
 
 main();

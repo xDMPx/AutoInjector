@@ -35,7 +35,9 @@ async function migrateFrom021To022() {
     if (ai_options === undefined) {
         ai_options = {
             confirmation_dialog_remove: true,
-            confirmation_dialog_edit: false
+            confirmation_dialog_edit: false,
+            enable_remove_indent_shift_tab: true,
+            enable_insert_tab_on_tab: true,
         }
         setAutoInjectorOptions(ai_options);
     }
