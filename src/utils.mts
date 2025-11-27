@@ -45,6 +45,7 @@ export async function saveAutoInjectorScript(name: string, url: string, script: 
         scripts = [];
     }
     scripts.push({
+        hash: djb2Hash(script),
         name: name,
         url: url,
         code: script,
@@ -70,6 +71,7 @@ export async function editAutoInjectorScript(i: number, name: string, url: strin
     scripts[i].name = name;
     scripts[i].url = url;
     scripts[i].code = script;
+    scripts[i].hash = djb2Hash(script);
     await chrome.storage.local.set({ "scripts": scripts });
 }
 

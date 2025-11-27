@@ -1,5 +1,5 @@
 import { AutoInjectorOptions } from "./interfaces.mjs";
-import { djb2Hash, canScriptRun, getAutoInjectorScripts, saveAutoInjectorScript, setAutoInjectorOptions } from "./utils.mjs";
+import { canScriptRun, getAutoInjectorScripts, saveAutoInjectorScript, setAutoInjectorOptions } from "./utils.mjs";
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
     if (details.reason === "update") {
@@ -55,10 +55,10 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     const tab = await chrome.tabs.get(activeInfo.tabId);
     let tab_url = tab.url || tab.pendingUrl;
     if (tab_url === undefined) return;
-    for (const { code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { code: s.code } })) {
+    for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
-            args: [code, djb2Hash(code)],
+            args: [code, hash],
             //injectImmediately: true,
             world: "MAIN",
             func: injectScript,
@@ -73,10 +73,10 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         const tab = await chrome.tabs.get(tabId);
         let tab_url = tab.url || tab.pendingUrl;
         if (tab_url === undefined) return;
-        for (const { code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { code: s.code } })) {
+        for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
-                args: [code, djb2Hash(code)],
+                args: [code, hash],
                 //injectImmediately: true,
                 world: "MAIN",
                 func: injectScript,

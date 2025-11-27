@@ -1,4 +1,5 @@
 export interface Script {
+    hash: number,
     name: string,
     url: string,
     code: string,
