@@ -122,7 +122,7 @@ function injectScript(code: string, hash: number, id: string) {
         const target = e.target;
         if (target !== null && target instanceof HTMLElement) {
             if (target.id.startsWith("autoinjector-script-") && target.id.endsWith(`${hash}`)) {
-                console.log(e);
+                console.error(`AutoInjector; Error: ${e}`);
                 chrome.runtime.sendMessage(id, {
                     hash: hash,
                     error: `CSP violation: directive ${e.violatedDirective} prevented injection of script at ${document.URL}`
@@ -134,7 +134,11 @@ function injectScript(code: string, hash: number, id: string) {
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.id = `autoinjector-script-${hash}`;
-    script.text = code;
+    script.text = `
+    try { ${code} }
+    catch (e) { console.error(\`AutoInjector; Error \${e}\`); 
+    chrome.runtime.sendMessage("${id}", { hash: ${hash}, error: \`\${e}; Occurred at: \${document.URL}\`});
+    }`;
     document.body.appendChild(script);
     console.log(script);
 }
