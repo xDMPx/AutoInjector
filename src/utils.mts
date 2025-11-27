@@ -1,4 +1,4 @@
-import { Script, AutoInjectorOptions } from "./interfaces.mjs";
+import { Script, AutoInjectorOptions, ScriptError } from "./interfaces.mjs";
 
 // http://www.cse.yorku.ca/~oz/hash.html
 export function djb2Hash(str: string): number {
@@ -111,3 +111,13 @@ export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions> {
 export async function setAutoInjectorOptions(ai_options: AutoInjectorOptions) {
     await chrome.storage.local.set({ "ai_options": ai_options });
 }
+
+export async function saveAutoInjectorScriptError(script_error: ScriptError) {
+    let { scripts_errors } = await chrome.storage.local.get("scripts_errors") as { [key: string]: ScriptError[] | undefined };
+    if (scripts_errors === undefined) {
+        scripts_errors = [];
+    }
+    scripts_errors.push(script_error);
+    await chrome.storage.local.set({ "scripts_errors": scripts_errors });
+}
+

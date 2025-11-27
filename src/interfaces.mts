@@ -12,3 +12,8 @@ export interface AutoInjectorOptions {
     enable_remove_indent_shift_tab: boolean
     enable_insert_tab_on_tab: boolean
 }
+
+export interface ScriptError {
+    hash: number,
+    message: string,
+}

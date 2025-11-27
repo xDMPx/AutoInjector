@@ -1,5 +1,5 @@
-import { AutoInjectorOptions } from "./interfaces.mjs";
-import { canScriptRun, djb2Hash, getAutoInjectorScripts, saveAutoInjectorScript, setAutoInjectorOptions } from "./utils.mjs";
+import { AutoInjectorOptions, ScriptError } from "./interfaces.mjs";
+import { canScriptRun, djb2Hash, getAutoInjectorScripts, saveAutoInjectorScript, saveAutoInjectorScriptError, setAutoInjectorOptions } from "./utils.mjs";
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
     if (details.reason === "update") {
@@ -67,7 +67,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
-            args: [code, hash],
+            args: [code, hash, chrome.runtime.id],
             //injectImmediately: true,
             world: "MAIN",
             func: injectScript,
@@ -85,7 +85,7 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
-                args: [code, hash],
+                args: [code, hash, chrome.runtime.id],
                 //injectImmediately: true,
                 world: "MAIN",
                 func: injectScript,
@@ -94,7 +94,13 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
     }
 });
 
-function injectScript(code: string, hash: number) {
+chrome.runtime.onMessageExternal.addListener(async (_msg) => {
+    const msg = _msg as ScriptError;
+    saveAutoInjectorScriptError(msg);
+    console.log(msg);
+});
+
+function injectScript(code: string, hash: number, id: string) {
     const auto_injector_script = document.getElementById(`autoinjector-script-${hash}`);
     if (auto_injector_script !== null) return;
 
@@ -111,11 +117,24 @@ function injectScript(code: string, hash: number) {
         }
     }
 
+
+    document.addEventListener("securitypolicyviolation", (e) => {
+        const target = e.target;
+        if (target !== null && target instanceof HTMLElement) {
+            if (target.id.startsWith("autoinjector-script-") && target.id.endsWith(`${hash}`)) {
+                console.log(e);
+                chrome.runtime.sendMessage(id, {
+                    hash: hash,
+                    error: `CSP violation: directive ${e.violatedDirective} prevented injection of script at ${document.URL}`
+                });
+            }
+        }
+    });
+
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.id = `autoinjector-script-${hash}`;
     script.text = code;
     document.body.appendChild(script);
     console.log(script);
-
 }

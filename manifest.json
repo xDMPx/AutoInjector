@@ -23,6 +23,9 @@
     "options_ui": {
         "page": "options.html"
     },
+    "externally_connectable": {
+        "matches": ["<all_urls>"]
+    },
     "browser_specific_settings": {
         "gecko": {
             "id": "{632c8b71-85ce-4941-983f-3aac02d58830}"
