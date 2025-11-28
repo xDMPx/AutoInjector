@@ -64,6 +64,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     const tab = await chrome.tabs.get(activeInfo.tabId);
     let tab_url = tab.url || tab.pendingUrl;
     if (tab_url === undefined) return;
+    if (!tab_url.startsWith("http")) return;
     for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
@@ -82,6 +83,7 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         const tab = await chrome.tabs.get(tabId);
         let tab_url = tab.url || tab.pendingUrl;
         if (tab_url === undefined) return;
+        if (!tab_url.startsWith("http")) return;
         for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
