@@ -69,6 +69,14 @@
         </div>
     </div>
 
+    <div class="fab">
+        <button id="fab_display_errors" class="btn btn-lg btn-circle btn-error hidden">
+            <span class="material-symbols-outlined" style="font-size: 30px;">
+                dangerous
+            </span>
+        </button>
+    </div>
+
     <div id="toast" class="hidden toast toast-start">
         <div class="alert alert-info">
             <span id="toast-text"></span>
@@ -186,6 +194,17 @@
             <form method="dialog">
                 <button class="btn">Close</button>
             </form>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<dialog id="error_display_modal" class="modal">
+    <div class="modal-box">
+        <h2 class="text-lg font-bold">Scripts Injection Errors</h2>
+        <div id="script_injection_errors">
         </div>
     </div>
     <form method="dialog" class="modal-backdrop">

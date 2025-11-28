@@ -1,5 +1,5 @@
 import { Script } from "./interfaces.mjs";
-import { deleteAutoInjectorScript, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
+import { deleteAutoInjectorScript, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -57,6 +57,37 @@ async function main() {
     about_description_text.innerText = `${chrome.runtime.getManifest().description}`;
     const about_version_text = document.getElementById("about-version_text")!;
     about_version_text.innerText = `Version v${chrome.runtime.getManifest().version}`;
+
+
+    const display_errors = document.getElementById("fab_display_errors")!;
+    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+    if (auto_injector_scripts_errors.length > 0) {
+        display_errors.style.display = "inline-flex";
+    }
+    if (auto_injector_scripts_errors.length == 0) {
+        display_errors.style.display = "none";
+    }
+    display_errors.onclick = async () => {
+        const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
+        error_display_modal.showModal();
+
+        const script_injection_errors_div = document.getElementById("script_injection_errors")! as HTMLDivElement;
+        script_injection_errors_div.children.item(0)?.remove();
+        const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+        const list = document.createElement("ol");
+        for (const error of auto_injector_scripts_errors) {
+            const list_item = document.createElement("li");
+            list_item.className = "p-2";
+            const div = document.createElement("div");
+            div.className = "alert alert-error alert-outline inline-flex w-full";
+            div.role = "alert";
+            div.innerHTML = `<span>${error.message}</span>`;
+
+            list_item.appendChild(div);
+            list.appendChild(list_item);
+        }
+        script_injection_errors_div.appendChild(list);
+    };
 }
 
 main();

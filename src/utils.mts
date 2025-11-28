@@ -121,3 +121,11 @@ export async function saveAutoInjectorScriptError(script_error: ScriptError) {
     await chrome.storage.local.set({ "scripts_errors": scripts_errors });
 }
 
+export async function getAutoInjectorScriptErrors(): Promise<ScriptError[]> {
+    let { scripts_errors } = await chrome.storage.local.get("scripts_errors") as { [key: string]: ScriptError[] | undefined };
+    if (scripts_errors === undefined) {
+        scripts_errors = [];
+    }
+
+    return scripts_errors;
+}
