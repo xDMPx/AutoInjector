@@ -129,3 +129,12 @@ export async function getAutoInjectorScriptErrors(): Promise<ScriptError[]> {
 
     return scripts_errors;
 }
+
+export async function getAutoInjectorScriptByHash(hash: number): Promise<Script | undefined> {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+
+    return scripts.find((s) => s.hash === hash)
+}
