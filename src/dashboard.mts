@@ -1,5 +1,5 @@
 import { Script } from "./interfaces.mjs";
-import { deleteAutoInjectorScript, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
+import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -75,16 +75,28 @@ async function main() {
         script_injection_errors_div.children.item(0)?.remove();
         const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
         const list = document.createElement("ol");
-        for (const error of auto_injector_scripts_errors) {
+        for (const [i, error] of auto_injector_scripts_errors.entries()) {
             const list_item = document.createElement("li");
             list_item.className = "p-2";
 
             const script = await getAutoInjectorScriptByHash(error.hash);
             const div = document.createElement("div");
-            div.className = "alert alert-error alert-outline inline-flex w-full";
+            div.className = "alert alert-error alert-outline inline-flex w-full relative";
             div.role = "alert";
-            div.innerHTML = `<div class="grid"><span class="font-semibold">${script?.name}</span><span>${error.message}</span></div>`;
+            div.innerHTML = `<div class="grid">
+                <span class="font-semibold">${script?.name}</span>
+                <span>${error.message}</span>
+            </div>`;
 
+            const dismiss_button = document.createElement("button");
+            dismiss_button.className = "btn btn-sm btn-circle btn-ghost absolute right-1 top-1";
+            dismiss_button.innerText = "✕";
+            dismiss_button.onclick = () => {
+                deleteAutoInjectorScriptErrors(error);
+                div.remove();
+            }
+
+            div.appendChild(dismiss_button);
             list_item.appendChild(div);
             list.appendChild(list_item);
         }

@@ -130,6 +130,17 @@ export async function getAutoInjectorScriptErrors(): Promise<ScriptError[]> {
     return scripts_errors;
 }
 
+export async function deleteAutoInjectorScriptErrors(se: ScriptError) {
+    let { scripts_errors } = await chrome.storage.local.get("scripts_errors") as { [key: string]: ScriptError[] | undefined };
+    if (scripts_errors === undefined) {
+        scripts_errors = [];
+    }
+
+    const i = scripts_errors.findIndex((s) => s === se);
+    scripts_errors.splice(i, 1);
+    await chrome.storage.local.set({ "scripts_errors": scripts_errors });
+}
+
 export async function getAutoInjectorScriptByHash(hash: number): Promise<Script | undefined> {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
