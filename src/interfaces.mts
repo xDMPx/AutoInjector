@@ -16,4 +16,5 @@ export interface AutoInjectorOptions {
 export interface ScriptError {
     hash: number,
     message: string,
+    timestamp: number
 }

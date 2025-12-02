@@ -85,6 +85,7 @@ async function main() {
             div.role = "alert";
             div.innerHTML = `<div class="grid">
                 <span class="font-semibold">${script?.name}</span>
+                <span>${new Date(error.timestamp)}</span>
                 <span>${error.message}</span>
             </div>`;
 
