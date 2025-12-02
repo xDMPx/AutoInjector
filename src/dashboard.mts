@@ -75,6 +75,8 @@ async function main() {
         script_injection_errors_div.children.item(0)?.remove();
         const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
         const list = document.createElement("ol");
+
+        auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
         for (const error of auto_injector_scripts_errors) {
             const list_item = document.createElement("li");
             list_item.className = "p-2";
