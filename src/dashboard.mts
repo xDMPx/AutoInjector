@@ -70,6 +70,12 @@ async function main() {
     display_errors.onclick = async () => {
         const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
         error_display_modal.showModal();
+        error_display_modal.onclose = async () => {
+            const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+            if (auto_injector_scripts_errors.length == 0) {
+                display_errors.style.display = "none";
+            }
+        };
 
         const script_injection_errors_div = document.getElementById("script_injection_errors")! as HTMLDivElement;
         script_injection_errors_div.children.item(0)?.remove();
@@ -94,9 +100,12 @@ async function main() {
             const dismiss_button = document.createElement("button");
             dismiss_button.className = "btn btn-sm btn-circle btn-ghost absolute right-1 top-1";
             dismiss_button.innerText = "✕";
-            dismiss_button.onclick = () => {
-                deleteAutoInjectorScriptErrors(error);
-                div.remove();
+            dismiss_button.onclick = async () => {
+                await deleteAutoInjectorScriptErrors(error);
+                list_item.remove();
+                if (list.children.length == 0) {
+                    error_display_modal.close();
+                }
             }
 
             div.appendChild(dismiss_button);
@@ -111,6 +120,7 @@ async function main() {
             for (const error of auto_injector_scripts_errors) {
                 await deleteAutoInjectorScriptErrors(error);
             }
+            error_display_modal.close();
         }
     };
 }
