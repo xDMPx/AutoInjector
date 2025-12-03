@@ -67,62 +67,7 @@ async function main() {
     if (auto_injector_scripts_errors.length == 0) {
         display_errors.style.display = "none";
     }
-    display_errors.onclick = async () => {
-        const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
-        error_display_modal.showModal();
-        error_display_modal.onclose = async () => {
-            const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-            if (auto_injector_scripts_errors.length == 0) {
-                display_errors.style.display = "none";
-            }
-        };
-
-        const script_injection_errors_div = document.getElementById("script_injection_errors")! as HTMLDivElement;
-        script_injection_errors_div.children.item(0)?.remove();
-        const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-        const list = document.createElement("ol");
-
-        auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
-        for (const error of auto_injector_scripts_errors) {
-            const list_item = document.createElement("li");
-            list_item.className = "p-2";
-
-            const script = await getAutoInjectorScriptByHash(error.hash);
-            const div = document.createElement("div");
-            div.className = "alert alert-error alert-outline inline-flex w-full relative";
-            div.role = "alert";
-            div.innerHTML = `<div class="grid">
-                <span class="font-semibold">${script?.name}</span>
-                <span>${new Date(error.timestamp)}</span>
-                <span>${error.message}</span>
-            </div>`;
-
-            const dismiss_button = document.createElement("button");
-            dismiss_button.className = "btn btn-sm btn-circle btn-ghost absolute right-1 top-1";
-            dismiss_button.innerText = "✕";
-            dismiss_button.onclick = async () => {
-                await deleteAutoInjectorScriptErrors(error);
-                list_item.remove();
-                if (list.children.length == 0) {
-                    error_display_modal.close();
-                }
-            }
-
-            div.appendChild(dismiss_button);
-            list_item.appendChild(div);
-            list.appendChild(list_item);
-        }
-        script_injection_errors_div.appendChild(list);
-
-        const script_injection_errors_dissmis = document.getElementById("script_injection_errors_dissmis")!;
-        script_injection_errors_dissmis.onclick = async () => {
-            list.remove();
-            for (const error of auto_injector_scripts_errors) {
-                await deleteAutoInjectorScriptErrors(error);
-            }
-            error_display_modal.close();
-        }
-    };
+    display_errors.onclick = displayErrorsModal;
 }
 
 main();
@@ -228,6 +173,72 @@ function editScriptMode(i: number, name: string, url: string, script: string) {
     user_script_text.style.height = `${user_script_text.scrollHeight}px`;
     user_script_name.value = name;
     user_script_url.value = url;
+}
+
+async function displayErrorsModal() {
+    const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
+    error_display_modal.showModal();
+    error_display_modal.onclose = async () => {
+        const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+        if (auto_injector_scripts_errors.length == 0) {
+            const display_errors = document.getElementById("fab_display_errors")!;
+            display_errors.style.display = "none";
+        }
+    };
+
+    const script_injection_errors_div = document.getElementById("script_injection_errors")! as HTMLDivElement;
+    script_injection_errors_div.children.item(0)?.remove();
+    script_injection_errors_div.appendChild(await createInjectionErrorList());
+
+    const script_injection_errors_dissmis = document.getElementById("script_injection_errors_dissmis")!;
+    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+    script_injection_errors_dissmis.onclick = async () => {
+        script_injection_errors_div.children.item(0)?.remove();
+        for (const error of auto_injector_scripts_errors) {
+            await deleteAutoInjectorScriptErrors(error);
+        }
+        error_display_modal.close();
+    }
+
+}
+
+async function createInjectionErrorList() {
+    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+    auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
+
+    const list = document.createElement("ol");
+    for (const error of auto_injector_scripts_errors) {
+        const list_item = document.createElement("li");
+        list_item.className = "p-2";
+
+        const script = await getAutoInjectorScriptByHash(error.hash);
+        const div = document.createElement("div");
+        div.className = "alert alert-error alert-outline inline-flex w-full relative";
+        div.role = "alert";
+        div.innerHTML = `<div class="grid">
+                <span class="font-semibold">${script?.name}</span>
+                <span>${new Date(error.timestamp)}</span>
+                <span>${error.message}</span>
+            </div>`;
+
+        const dismiss_button = document.createElement("button");
+        dismiss_button.className = "btn btn-sm btn-circle btn-ghost absolute right-1 top-1";
+        dismiss_button.innerText = "✕";
+        dismiss_button.onclick = async () => {
+            await deleteAutoInjectorScriptErrors(error);
+            list_item.remove();
+            if (list.children.length == 0) {
+                const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
+                error_display_modal.close();
+            }
+        }
+
+        div.appendChild(dismiss_button);
+        list_item.appendChild(div);
+        list.appendChild(list_item);
+    }
+
+    return list;
 }
 
 
