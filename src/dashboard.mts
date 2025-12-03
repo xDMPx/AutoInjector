@@ -72,6 +72,24 @@ async function main() {
 
 main();
 
+
+chrome.runtime.onMessage.addListener(async (_msg) => {
+    const display_errors = document.getElementById("fab_display_errors")!;
+    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+    if (auto_injector_scripts_errors.length > 0) {
+        display_errors.style.display = "inline-flex";
+    }
+    if (auto_injector_scripts_errors.length == 0) {
+        display_errors.style.display = "none";
+    }
+
+    const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
+    if (error_display_modal.checkVisibility({ visibilityProperty: true })) {
+        displayErrorsModal();
+    }
+
+});
+
 async function createScriptList() {
     const scripts = await getAutoInjectorScripts();
     const list = document.createElement("ol");

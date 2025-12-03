@@ -98,8 +98,9 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
 
 chrome.runtime.onMessageExternal.addListener(async (_msg) => {
     const msg = _msg as ScriptError;
-    saveAutoInjectorScriptError(msg);
+    await saveAutoInjectorScriptError(msg);
     console.log(msg);
+    chrome.runtime.sendMessage("Update");
 });
 
 function injectScript(code: string, hash: number, id: string) {
