@@ -32,11 +32,14 @@
         </form>
         <div id="script-div"></div>
     </div>
+
     <div class="fab fixed bottom-[unset] top-[1rem] flex-col">
-        <div tabindex="0" role="button" class="btn btn-lg btn-circle btn-primary">
-            <span class="material-symbols-outlined">
-                menu
-            </span>
+        <div class="tooltip tooltip-left" data-tip="Action menu">
+            <div tabindex="0" role="button" class="btn btn-lg btn-circle btn-primary">
+                <span class="material-symbols-outlined">
+                    menu
+                </span>
+            </div>
         </div>
 
         <div class="tooltip tooltip-left" data-tip="Export scripts">
@@ -70,11 +73,13 @@
     </div>
 
     <div class="fab">
-        <button id="fab_display_errors" class="btn btn-lg btn-circle btn-error hidden">
-            <span class="material-symbols-outlined" style="font-size: 30px;">
-                dangerous
-            </span>
-        </button>
+        <div class="tooltip tooltip-left" data-tip="Scripts Injection Errors">
+            <button id="fab_display_errors" class="btn btn-lg btn-circle btn-error hidden">
+                <span class="material-symbols-outlined" style="font-size: 30px;">
+                    dangerous
+                </span>
+            </button>
+        </div>
     </div>
 
     <div id="toast" class="hidden toast toast-start">
