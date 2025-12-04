@@ -133,7 +133,13 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     const edit_button = document.createElement("button");
     edit_button.className = "btn btn-accent m-auto";
     edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
-    edit_button.onclick = () => { editScriptMode(script_num, name, url, code) };
+    edit_button.onclick = () => {
+        edit_button_tooltip.setAttribute("data-tip", "Cancel edit");
+        edit_button.innerHTML = "<span class=\"material-symbols-outlined\">cancel</span>";
+        edit_button.className = "btn btn-secondary m-auto";
+        editScriptMode(script_num, name, url, code);
+        edit_button.onclick = () => { reload() };
+    };
     edit_button_tooltip.appendChild(edit_button);
 
     const copy_button_tooltip = document.createElement("div");
