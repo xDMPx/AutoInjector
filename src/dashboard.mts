@@ -99,13 +99,13 @@ async function createScriptList() {
     const list = document.createElement("ol");
     list.className = "list-decimal list-outside p-1";
     if (scripts !== undefined) {
-        for (const [i, { name, url, code, enabled }] of scripts.entries()) {
+        for (const [i, { name, url, code, enabled, injectImmediately }] of scripts.entries()) {
             const list_item = document.createElement("li");
             const div = document.createElement("div");
             div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
-            const script_collapse_div = createScriptCollapse(name, url, code);
-            const script_buttons_div = createScriptButtons(name, url, code, enabled, i);
+            const script_collapse_div = createScriptCollapse(name, url, code, injectImmediately);
+            const script_buttons_div = createScriptButtons(name, url, code, enabled, i, injectImmediately);
 
             div.appendChild(script_collapse_div);
             div.appendChild(script_buttons_div);
@@ -117,7 +117,7 @@ async function createScriptList() {
     return list;
 }
 
-function createScriptButtons(name: string, url: string, code: string, enabled: boolean, script_num: number): HTMLDivElement {
+function createScriptButtons(name: string, url: string, code: string, enabled: boolean, script_num: number, injectImmediately: boolean): HTMLDivElement {
     const script_buttons_div = document.createElement("div");
     script_buttons_div.className = "flex place-items-center gap-4";
 
@@ -141,7 +141,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
         edit_button_tooltip.setAttribute("data-tip", "Cancel edit");
         edit_button.innerHTML = "<span class=\"material-symbols-outlined\">cancel</span>";
         edit_button.className = "btn btn-secondary m-auto";
-        editScriptMode(script_num, name, url, code);
+        editScriptMode(script_num, name, url, code, injectImmediately);
         edit_button.onclick = () => { reload() };
     };
     edit_button_tooltip.appendChild(edit_button);
@@ -172,13 +172,19 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     return script_buttons_div;
 }
 
-function createScriptCollapse(name: string, url: string, code: string): HTMLDivElement {
+function createScriptCollapse(name: string, url: string, code: string, injectImmediately: boolean): HTMLDivElement {
     const script_collapse_div = document.createElement("div");
     script_collapse_div.tabIndex = 0;
     script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
     const script_collapse_title_div = document.createElement("div");
     script_collapse_title_div.className = "collapse-title whitespace-pre-wrap break-all";
-    script_collapse_title_div.innerText = `${name}\nURL: ${url}`;
+    script_collapse_title_div.innerText = `${name}\nURL: ${url}\nInject Immediately: `;
+    const script_inject_immediately_input = document.createElement("input");
+    script_inject_immediately_input.disabled = true;
+    script_inject_immediately_input.type = "checkbox";
+    script_inject_immediately_input.className = "checkbox checkbox-primary";
+    script_inject_immediately_input.checked = injectImmediately;
+    script_collapse_title_div.appendChild(script_inject_immediately_input);
     const script_collapse_content_div = document.createElement("div");
     script_collapse_content_div.className = "collapse-content whitespace-pre-wrap break-all";
     script_collapse_content_div.innerText = code;
@@ -188,9 +194,10 @@ function createScriptCollapse(name: string, url: string, code: string): HTMLDivE
     return script_collapse_div;
 }
 
-function editScriptMode(i: number, name: string, url: string, script: string) {
+function editScriptMode(i: number, name: string, url: string, script: string, injectImmediately: boolean) {
     const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
+    const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const submit_script_button = document.getElementById("submit-script") as HTMLButtonElement;
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
@@ -201,6 +208,7 @@ function editScriptMode(i: number, name: string, url: string, script: string) {
     user_script_text.style.height = `${user_script_text.scrollHeight}px`;
     user_script_name.value = name;
     user_script_url.value = url;
+    user_script_inject_immediately.checked = injectImmediately;
 }
 
 async function displayErrorsModal() {
@@ -358,8 +366,9 @@ async function saveScript(e: SubmitEvent) {
     e.preventDefault();
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
+    const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
-    await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value, false);
+    await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
 
     shortToast(`Script "${user_script_name.value}" saved successfully!"`);
     reload();
@@ -398,12 +407,14 @@ async function editScript(e: SubmitEvent, i: number) {
             if (e.submitter?.id === "edit_script_modal-yes") {
                 const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
                 const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+                const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
                 const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
                 const name = user_script_name.value;
-                await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value);
+                await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
                 user_script_text.value = "";
                 user_script_name.value = "";
                 user_script_url.value = "*";
+                user_script_inject_immediately.checked = false;
 
                 shortToast(`Script "${name}" updated successfully!`);
                 reload();
@@ -413,12 +424,14 @@ async function editScript(e: SubmitEvent, i: number) {
     } else {
         const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
         const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+        const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
         const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
         const name = user_script_name.value;
-        await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value);
+        await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
         user_script_text.value = "";
         user_script_name.value = "";
         user_script_url.value = "*";
+        user_script_inject_immediately.checked = false;
 
         shortToast(`Script "${name}" updated successfully!`);
         reload();
@@ -539,10 +552,12 @@ function reload() {
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
+    const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
 
     user_script_text.value = "";
     user_script_name.value = "";
     user_script_url.value = "*";
+    user_script_inject_immediately.checked = false;
 
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     submit_script_form.reset();

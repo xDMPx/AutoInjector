@@ -26,6 +26,10 @@
                     pattern="^[^*]*\*?$" />
                 <div class="validator-hint">Only one wildcard allowed at the end</div>
             </label>
+            <label class="input w-auto outline outline-offset-[unset]">
+                <span class="label">Inject Immediately</span>
+                <input id="user-script-inject-immediately" type="checkbox" class="checkbox checkbox-primary" />
+            </label>
             <textarea required class="outline p-4" id="user-script" spellcheck="false"
                 placeholder="JavaScript"></textarea>
             <button class="btn btn-primary" id="submit-script">Submit</button>
