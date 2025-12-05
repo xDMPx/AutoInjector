@@ -479,13 +479,14 @@ async function importScripts(data: string) {
     const saved_scripts = (await getAutoInjectorScripts())?.map((s) => s.hash);
     const saved_scripts_hash = new Set(saved_scripts);
 
-    const imported_scripts = JSON.parse(data) as { hash: number | undefined, name: string | undefined, url: string | undefined, code: string, enabled: boolean }[];
+    const imported_scripts = JSON.parse(data) as { hash: number | undefined, name: string | undefined, url: string | undefined, code: string, enabled: boolean, injectImmediately: boolean | undefined }[];
     let i = (saved_scripts === undefined) ? 0 : saved_scripts.length + 1;
     const scripts: Script[] = imported_scripts.map((s) => {
         if (s.name === undefined) s.name = `Script ${i++}`;
         if (s.url === undefined) s.url = "*";
         if (s.hash === undefined) s.hash = djb2Hash(s.code);
-        return { hash: s.hash, name: s.name, url: s.url, code: s.code, enabled: s.enabled, injectImmediately: false };
+        if (s.injectImmediately === undefined) s.injectImmediately = false;
+        return { hash: s.hash, name: s.name, url: s.url, code: s.code, enabled: s.enabled, injectImmediately: s.injectImmediately };
     });
     const duplicate_scripts: Script[] = [];
     let imported_scripts_count = 0;
