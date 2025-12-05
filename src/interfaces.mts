@@ -3,7 +3,8 @@ export interface Script {
     name: string,
     url: string,
     code: string,
-    enabled: boolean
+    enabled: boolean,
+    injectImmediately: boolean
 }
 
 export interface AutoInjectorOptions {

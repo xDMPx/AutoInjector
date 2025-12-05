@@ -9,7 +9,7 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
         await migrateFrom022To023();
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
-            saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false);
+            saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false, false);
         }
     }
 });
@@ -65,11 +65,11 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     let tab_url = tab.url || tab.pendingUrl;
     if (tab_url === undefined) return;
     if (!tab_url.startsWith("http")) return;
-    for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
+    for (const { hash, code, injectImmediately } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code, injectImmediately: s.injectImmediately } })) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
             args: [code, hash, chrome.runtime.id],
-            //injectImmediately: true,
+            injectImmediately: injectImmediately,
             world: "MAIN",
             func: injectScript,
         });
@@ -84,11 +84,11 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         let tab_url = tab.url || tab.pendingUrl;
         if (tab_url === undefined) return;
         if (!tab_url.startsWith("http")) return;
-        for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
+        for (const { hash, code, injectImmediately } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code, injectImmediately: s.injectImmediately } })) {
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 args: [code, hash, chrome.runtime.id],
-                //injectImmediately: true,
+                injectImmediately: injectImmediately,
                 world: "MAIN",
                 func: injectScript,
             });

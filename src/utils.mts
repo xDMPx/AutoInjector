@@ -39,7 +39,7 @@ export async function getAutoInjectorScripts(): Promise<Script[] | undefined> {
     return scripts;
 }
 
-export async function saveAutoInjectorScript(name: string, url: string, script: string, enabled: boolean = true) {
+export async function saveAutoInjectorScript(name: string, url: string, script: string, injectImmediately: boolean, enabled: boolean = true) {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
@@ -49,7 +49,8 @@ export async function saveAutoInjectorScript(name: string, url: string, script: 
         name: name,
         url: url,
         code: script,
-        enabled: enabled
+        enabled: enabled,
+        injectImmediately: injectImmediately
     });
     await chrome.storage.local.set({ "scripts": scripts });
 }
@@ -90,6 +91,24 @@ export async function disableAutoInjectorScript(i: number) {
         scripts = [];
     }
     scripts[i].enabled = false;
+    await chrome.storage.local.set({ "scripts": scripts });
+}
+
+export async function enableImmediatInjectionForAutoInjectorScript(i: number) {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+    scripts[i].injectImmediately = false;
+    await chrome.storage.local.set({ "scripts": scripts });
+}
+
+export async function disableImmediatInjectionForAutoInjectorScript(i: number) {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+    scripts[i].injectImmediately = false;
     await chrome.storage.local.set({ "scripts": scripts });
 }
 

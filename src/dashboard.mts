@@ -359,7 +359,7 @@ async function saveScript(e: SubmitEvent) {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
-    await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value);
+    await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value, false);
 
     shortToast(`Script "${user_script_name.value}" saved successfully!"`);
     reload();
@@ -485,7 +485,7 @@ async function importScripts(data: string) {
         if (s.name === undefined) s.name = `Script ${i++}`;
         if (s.url === undefined) s.url = "*";
         if (s.hash === undefined) s.hash = djb2Hash(s.code);
-        return { hash: s.hash, name: s.name, url: s.url, code: s.code, enabled: s.enabled };
+        return { hash: s.hash, name: s.name, url: s.url, code: s.code, enabled: s.enabled, injectImmediately: false };
     });
     const duplicate_scripts: Script[] = [];
     let imported_scripts_count = 0;
@@ -497,7 +497,7 @@ async function importScripts(data: string) {
             continue;
         };
         imported_scripts_count++;
-        await saveAutoInjectorScript(script.name, script.url, script.code, script.enabled);
+        await saveAutoInjectorScript(script.name, script.url, script.code, script.injectImmediately, script.enabled);
     }
     if (duplicate_scripts.length > 0) {
         const import_duplicate_script_modal = document.getElementById("import_duplicate_script_modal")! as HTMLDialogElement;
@@ -509,7 +509,7 @@ async function importScripts(data: string) {
                 for (const script of duplicate_scripts) {
                     imported_scripts_count++;
                     duplicate_scripts_count++;
-                    await saveAutoInjectorScript(script.name, script.url, script.code, script.enabled);
+                    await saveAutoInjectorScript(script.name, script.url, script.code, script.injectImmediately, script.enabled);
                 }
             }
             import_duplicate_script_modal.close();
