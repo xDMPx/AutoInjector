@@ -110,14 +110,14 @@ chrome.runtime.onMessage.addListener(async (_msg) => {
     const msg = _msg as ScriptError;
     await saveAutoInjectorScriptError(msg);
     console.log(msg);
-    chrome.runtime.sendMessage("Update");
+    chrome.runtime.sendMessage({ message: "ErrorUpdate" });
 });
 
 chrome.runtime.onMessageExternal.addListener(async (_msg) => {
     const msg = _msg as ScriptError;
     await saveAutoInjectorScriptError(msg);
     console.log(msg);
-    chrome.runtime.sendMessage("Update");
+    chrome.runtime.sendMessage({ message: "ErrorUpdate" });
 });
 
 function injectScript(code: string, hash: number, id: string) {

@@ -74,20 +74,24 @@ main();
 
 
 chrome.runtime.onMessage.addListener(async (_msg) => {
-    const display_errors = document.getElementById("fab_display_errors")!;
-    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-    if (auto_injector_scripts_errors.length > 0) {
-        display_errors.style.display = "inline-flex";
-    }
-    if (auto_injector_scripts_errors.length == 0) {
-        display_errors.style.display = "none";
-    }
+    if (_msg.message === undefined) return;
 
-    const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
-    if (error_display_modal.checkVisibility({ visibilityProperty: true })) {
-        displayErrorsModal();
-    }
+    const msg: String = _msg.message;
+    if (msg === "ErrorUpdate") {
+        const display_errors = document.getElementById("fab_display_errors")!;
+        const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+        if (auto_injector_scripts_errors.length > 0) {
+            display_errors.style.display = "inline-flex";
+        }
+        if (auto_injector_scripts_errors.length == 0) {
+            display_errors.style.display = "none";
+        }
 
+        const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
+        if (error_display_modal.checkVisibility({ visibilityProperty: true })) {
+            displayErrorsModal();
+        }
+    }
 });
 
 async function createScriptList() {
@@ -211,8 +215,9 @@ async function displayErrorsModal() {
     };
 
     const script_injection_errors_div = document.getElementById("script_injection_errors")! as HTMLDivElement;
+    const script_injection_errors_list = await createInjectionErrorList();
     script_injection_errors_div.children.item(0)?.remove();
-    script_injection_errors_div.appendChild(await createInjectionErrorList());
+    script_injection_errors_div.appendChild(script_injection_errors_list);
 
     const script_injection_errors_dissmis = document.getElementById("script_injection_errors_dissmis")!;
     const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
