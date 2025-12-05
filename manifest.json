@@ -26,6 +26,12 @@
     "externally_connectable": {
         "matches": ["<all_urls>"]
     },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["message_passing_content_script.js"]
+        }
+    ],
     "browser_specific_settings": {
         "gecko": {
             "id": "{632c8b71-85ce-4941-983f-3aac02d58830}"

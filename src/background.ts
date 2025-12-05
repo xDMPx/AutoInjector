@@ -68,11 +68,6 @@ chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedIn
     for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
         await chrome.scripting.executeScript({
             target: { tabId: activeInfo.tabId },
-            args: [],
-            func: messagePassingScript,
-        });
-        await chrome.scripting.executeScript({
-            target: { tabId: activeInfo.tabId },
             args: [code, hash, chrome.runtime.id],
             //injectImmediately: true,
             world: "MAIN",
@@ -90,11 +85,6 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
         if (tab_url === undefined) return;
         if (!tab_url.startsWith("http")) return;
         for (const { hash, code } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code } })) {
-            await chrome.scripting.executeScript({
-                target: { tabId: tabId },
-                args: [],
-                func: messagePassingScript,
-            });
             await chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 args: [code, hash, chrome.runtime.id],
@@ -186,11 +176,4 @@ function injectScript(code: string, hash: number, id: string) {
     }`;
     document.body.appendChild(script);
     console.log(script);
-}
-
-function messagePassingScript() {
-    window.addEventListener("AutoInjectorError", ((event: CustomEvent<string>) => {
-        event.stopImmediatePropagation();
-        chrome.runtime.sendMessage(event.detail);
-    }) as EventListener);
 }
