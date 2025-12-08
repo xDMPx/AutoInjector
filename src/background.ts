@@ -1,4 +1,4 @@
-import { AutoInjectorOptions, ScriptError } from "./interfaces.mjs";
+import { AutoInjectorMessage, AutoInjectorMessageType, AutoInjectorOptions } from "./interfaces.mjs";
 import { canScriptRun, djb2Hash, getAutoInjectorScripts, saveAutoInjectorScript, saveAutoInjectorScriptError, setAutoInjectorOptions } from "./utils.mjs";
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
@@ -106,17 +106,32 @@ chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.
 });
 
 chrome.runtime.onMessage.addListener(async (_msg) => {
-    const msg = _msg as ScriptError;
-    await saveAutoInjectorScriptError(msg);
+    const msg = _msg as AutoInjectorMessage;
     console.log(msg);
-    chrome.runtime.sendMessage({ message: "ErrorUpdate" });
+    if (msg.type === AutoInjectorMessageType.ScriptError) {
+        await saveAutoInjectorScriptError(msg.scriptError!);
+        const update_msg: AutoInjectorMessage = {
+            type: AutoInjectorMessageType.ErrorUpdate,
+        } as AutoInjectorMessage;
+        chrome.runtime.sendMessage(update_msg);
+    } else if (msg.type === AutoInjectorMessageType.ErrorUpdate) {
+        const update_msg: AutoInjectorMessage = {
+            type: AutoInjectorMessageType.ErrorUpdate,
+        } as AutoInjectorMessage;
+        chrome.runtime.sendMessage(update_msg);
+    }
 });
 
 chrome.runtime.onMessageExternal.addListener(async (_msg) => {
-    const msg = _msg as ScriptError;
-    await saveAutoInjectorScriptError(msg);
+    const msg = _msg as AutoInjectorMessage;
     console.log(msg);
-    chrome.runtime.sendMessage({ message: "ErrorUpdate" });
+    if (msg.type === AutoInjectorMessageType.ScriptError) {
+        await saveAutoInjectorScriptError(msg.scriptError!);
+        const update_msg: AutoInjectorMessage = {
+            type: AutoInjectorMessageType.ErrorUpdate,
+        } as AutoInjectorMessage;
+        chrome.runtime.sendMessage(update_msg);
+    }
 });
 
 function injectScript(code: string, hash: number, id: string) {
@@ -142,20 +157,32 @@ function injectScript(code: string, hash: number, id: string) {
         if (target !== null && target instanceof HTMLElement) {
             if (target.id.startsWith("autoinjector-script-") && target.id.endsWith(`${hash}`)) {
                 console.error(`AutoInjector; Error: ${e}`);
-                if (typeof chrome !== 'undefined') {
-                    chrome.runtime.sendMessage(id, {
-                        hash: hash,
-                        message: `CSP violation: directive ${e.violatedDirective} prevented injection of script at ${document.URL}`,
-                        timestamp: (new Date()).getTime(),
-                    });
+                enum AutoInjectorMessageType {
+                    ErrorUpdate,
+                    ScriptError,
                 }
-                else {
-                    const event = new CustomEvent<{ hash: number, message: string, timestamp: number }>("AutoInjectorError", {
-                        detail: {
+                if (typeof chrome !== 'undefined') {
+                    const msg: AutoInjectorMessage = {
+                        type: AutoInjectorMessageType.ScriptError,
+                        scriptError: {
                             hash: hash,
                             message: `CSP violation: directive ${e.violatedDirective} prevented injection of script at ${document.URL}`,
                             timestamp: (new Date()).getTime(),
                         }
+                    } as AutoInjectorMessage;
+                    chrome.runtime.sendMessage(id, msg);
+                }
+                else {
+                    const msg: AutoInjectorMessage = {
+                        type: AutoInjectorMessageType.ScriptError,
+                        scriptError: {
+                            hash: hash,
+                            message: `CSP violation: directive ${e.violatedDirective} prevented injection of script at ${document.URL}`,
+                            timestamp: (new Date()).getTime(),
+                        }
+                    } as AutoInjectorMessage;
+                    const event = new CustomEvent<AutoInjectorMessage>("AutoInjectorError", {
+                        detail: msg,
                     });
                     window.dispatchEvent(event);
                 }
@@ -170,16 +197,33 @@ function injectScript(code: string, hash: number, id: string) {
     try { ${code} }
     catch (e) { 
         console.error(\`AutoInjector; Error \${e}\`); 
-        if (typeof chrome !== 'undefined') {
-            chrome.runtime.sendMessage("${id}", { hash: ${hash}, message: \`\${e}; Occurred at: \${document.URL}\`, timestamp: (new Date()).getTime() });
-        } else {
-            const event = new CustomEvent("AutoInjectorError", {
-                detail: {
+
+        var AutoInjectorMessageType;
+        (function (AutoInjectorMessageType) {
+            AutoInjectorMessageType[AutoInjectorMessageType["ErrorUpdate"] = 0] = "ErrorUpdate";
+            AutoInjectorMessageType[AutoInjectorMessageType["ScriptError"] = 1] = "ScriptError";
+        })(AutoInjectorMessageType || (AutoInjectorMessageType = {}));
+
+        if (typeof chrome !== 'undefined') { 
+            const msg = {
+                type: AutoInjectorMessageType.ScriptError,
+                scriptError: {
                     hash: ${hash},
                     message: \`\${e}; Occurred at: \${document.URL}\`,
-                    timestamp: (new Date()).getTime()
+                    timestamp: (new Date()).getTime() 
                 }
-            });
+            };
+            chrome.runtime.sendMessage("${id}", msg);
+        } else {
+            const msg = {
+                type: AutoInjectorMessageType.ScriptError,
+                scriptError: {
+                    hash: ${hash},
+                    message: \`\${e}; Occurred at: \${document.URL}\`,
+                    timestamp: (new Date()).getTime() 
+                }
+            };
+            const event = new CustomEvent("AutoInjectorError", { detail: msg });
             window.dispatchEvent(event);
         }
     }`;

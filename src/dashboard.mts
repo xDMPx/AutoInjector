@@ -1,4 +1,4 @@
-import { Script } from "./interfaces.mjs";
+import { AutoInjectorMessage, AutoInjectorMessageType, Script } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 async function main() {
@@ -72,25 +72,24 @@ async function main() {
 
 main();
 
-
 chrome.runtime.onMessage.addListener(async (_msg) => {
-    if (_msg.message === undefined) return;
+    const msg = _msg as AutoInjectorMessage;
+    if (msg.type !== AutoInjectorMessageType.ErrorUpdate) {
+        return;
+    }
 
-    const msg: String = _msg.message;
-    if (msg === "ErrorUpdate") {
-        const display_errors = document.getElementById("fab_display_errors")!;
-        const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-        if (auto_injector_scripts_errors.length > 0) {
-            display_errors.style.display = "inline-flex";
-        }
-        if (auto_injector_scripts_errors.length == 0) {
-            display_errors.style.display = "none";
-        }
+    const display_errors = document.getElementById("fab_display_errors")!;
+    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+    if (auto_injector_scripts_errors.length > 0) {
+        display_errors.style.display = "inline-flex";
+    }
+    if (auto_injector_scripts_errors.length == 0) {
+        display_errors.style.display = "none";
+    }
 
-        const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
-        if (error_display_modal.checkVisibility({ visibilityProperty: true })) {
-            displayErrorsModal();
-        }
+    const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
+    if (error_display_modal.checkVisibility({ visibilityProperty: true })) {
+        displayErrorsModal();
     }
 });
 

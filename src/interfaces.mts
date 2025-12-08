@@ -7,6 +7,16 @@ export interface Script {
     injectImmediately: boolean
 }
 
+export enum AutoInjectorMessageType {
+    ErrorUpdate,
+    ScriptError,
+}
+
+export interface AutoInjectorMessage {
+    type: AutoInjectorMessageType,
+    scriptError: ScriptError | undefined,
+}
+
 export interface AutoInjectorOptions {
     confirmation_dialog_remove: boolean
     confirmation_dialog_edit: boolean
