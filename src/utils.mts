@@ -1,4 +1,4 @@
-import { Script, AutoInjectorOptions, ScriptError } from "./interfaces.mjs";
+import { Script, AutoInjectorOptions, ScriptError, AutoInjectorMessage, AutoInjectorMessageType } from "./interfaces.mjs";
 
 // http://www.cse.yorku.ca/~oz/hash.html
 export function djb2Hash(str: string): number {
@@ -72,11 +72,15 @@ export async function editAutoInjectorScript(i: number, name: string, url: strin
     if (scripts === undefined) {
         scripts = [];
     }
+
+    const old_hash = scripts[i].hash;
     scripts[i].name = name;
     scripts[i].url = url;
     scripts[i].code = script;
     scripts[i].hash = djb2Hash(script);
     scripts[i].injectImmediately = injectImmediately;
+
+    deletedAutoInjectorScriptErrorsForHash(old_hash);
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
@@ -182,6 +186,12 @@ export async function deletedAutoInjectorScriptErrorsForHash(hash: number) {
     }
 
     const filtered_scripts_errors = scripts_errors.filter((se) => { if (se.hash !== hash) return true; else return false; });
-
     await chrome.storage.local.set({ "scripts_errors": filtered_scripts_errors });
+
+
+    const update_msg: AutoInjectorMessage = {
+        type: AutoInjectorMessageType.ErrorUpdate,
+    } as AutoInjectorMessage;
+
+    chrome.runtime.sendMessage(update_msg);
 }
