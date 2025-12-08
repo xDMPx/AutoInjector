@@ -60,7 +60,10 @@ export async function deleteAutoInjectorScript(i: number) {
     if (scripts === undefined) {
         scripts = [];
     }
-    scripts.splice(i, 1);
+
+    const deleted_script = scripts.splice(i, 1);
+    deletedAutoInjectorScriptErrorsForHash(deleted_script[0].hash);
+
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
@@ -170,4 +173,15 @@ export async function getAutoInjectorScriptByHash(hash: number): Promise<Script 
     }
 
     return scripts.find((s) => s.hash === hash)
+}
+
+export async function deletedAutoInjectorScriptErrorsForHash(hash: number) {
+    let { scripts_errors } = await chrome.storage.local.get("scripts_errors") as { [key: string]: ScriptError[] | undefined };
+    if (scripts_errors === undefined) {
+        scripts_errors = [];
+    }
+
+    const filtered_scripts_errors = scripts_errors.filter((se) => { if (se.hash !== hash) return true; else return false; });
+
+    await chrome.storage.local.set({ "scripts_errors": filtered_scripts_errors });
 }
