@@ -79,7 +79,7 @@
     <div class="fab">
         <div class="tooltip tooltip-left" data-tip="Scripts Injection Errors">
             <button id="fab_display_errors" class="btn btn-lg btn-circle btn-error hidden">
-                <span class="material-symbols-outlined" style="font-size: 30px;">
+                <span class=" material-symbols-outlined" style="font-size: 30px;">
                     dangerous
                 </span>
             </button>
@@ -212,7 +212,26 @@
 
 <dialog id="error_display_modal" class="modal">
     <div class="modal-box">
-        <h2 class="text-lg font-bold">Scripts Injection Errors</h2>
+        <div class="flex">
+            <h2 class="text-lg font-bold">Scripts Injection Errors</h2>
+            <div class="dropdown dropdown-end ml-auto">
+                <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-ghost m-1">
+                    <span class="material-symbols-outlined">
+                        sort
+                    </span>
+                </div>
+                <ul tabindex="-1" class="dropdown-content menu bg-base-100 rounded-box z-1 w-30 p-2 shadow-sm">
+                    <li id="error_modal_sort_by_date" class="inline-flex">
+                        <div class="mx-auto">
+                            <div>Date</div>
+                            <div id="error_modal_sort_by_date_symbol" class="material-symbols-outlined">
+                                arrow_upward
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
         <div id="script_injection_errors">
         </div>
         <button id="script_injection_errors_dissmis" class="btn btn-primary">Clear all</button>

@@ -1,6 +1,8 @@
 import { AutoInjectorMessage, AutoInjectorMessageType, Script } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
+let errors_sort_by_date_ascending = true;
+
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
     script_div.appendChild(await createScriptList());
@@ -71,6 +73,14 @@ async function main() {
         display_errors.style.display = "none";
     }
     display_errors.onclick = displayErrorsModal;
+
+    const error_modal_sort_by_date = document.getElementById("error_modal_sort_by_date")!;
+    error_modal_sort_by_date.onclick = () => {
+        errors_sort_by_date_ascending = !errors_sort_by_date_ascending;
+        if (errors_sort_by_date_ascending) document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_upward";
+        else document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_downward";
+        displayErrorsModal();
+    };
 }
 
 main();
@@ -220,6 +230,10 @@ function editScriptMode(i: number, name: string, url: string, script: string, in
 async function displayErrorsModal() {
     const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
     error_display_modal.showModal();
+    // Fix for open by default dropdown
+    (document.activeElement! as HTMLElement).blur();
+
+    console.log(document.activeElement);
     error_display_modal.onclose = async () => {
         const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
         if (auto_injector_scripts_errors.length == 0) {
@@ -247,7 +261,8 @@ async function displayErrorsModal() {
 
 async function createInjectionErrorList() {
     const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-    auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
+    if (errors_sort_by_date_ascending) auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
+    else auto_injector_scripts_errors.sort((a, b) => a.timestamp - b.timestamp);
 
     const list = document.createElement("ol");
     for (const error of auto_injector_scripts_errors) {
