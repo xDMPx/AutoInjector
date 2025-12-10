@@ -40,6 +40,7 @@ async function migrateFrom021To022() {
             confirmation_dialog_edit: false,
             enable_remove_indent_shift_tab: true,
             enable_insert_tab_on_tab: true,
+            enable_setting_inject_immediately: false
         }
         setAutoInjectorOptions(ai_options);
     }

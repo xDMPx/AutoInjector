@@ -34,6 +34,14 @@ async function main() {
         auto_injector_options.enable_insert_tab_on_tab = enable_insert_tab_on_tab_checkbox.checked;
         setAutoInjectorOptions(auto_injector_options);
     };
+    const enable_setting_inject_immediately_checkbox = document.getElementById("enable_setting_inject_immediately_checkbox") as HTMLInputElement;
+    enable_setting_inject_immediately_checkbox.checked = auto_injector_options.enable_setting_inject_immediately;
+    enable_setting_inject_immediately_checkbox.onclick = async () => {
+        const auto_injector_options = (await getAutoInjectorOptions())!;
+        const enable_setting_inject_immediately_checkbox = document.getElementById("enable_setting_inject_immediately_checkbox") as HTMLInputElement;
+        auto_injector_options.enable_setting_inject_immediately = enable_setting_inject_immediately_checkbox.checked;
+        setAutoInjectorOptions(auto_injector_options);
+    };
 }
 
 main();

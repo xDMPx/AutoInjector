@@ -33,6 +33,9 @@ async function main() {
         }
     };
     autoResizeTextArea();
+    if (!options.enable_setting_inject_immediately) {
+        document.getElementById("user-script-inject-immediately-label")!.style.display = "none";
+    }
 
     const export_button = document.getElementById("btn_export")!;
     export_button.onclick = exportScripts;
@@ -94,6 +97,7 @@ chrome.runtime.onMessage.addListener(async (_msg) => {
 });
 
 async function createScriptList() {
+    const options = await getAutoInjectorOptions();
     const scripts = await getAutoInjectorScripts();
     const list = document.createElement("ol");
     list.className = "list-decimal list-outside p-1";
@@ -103,7 +107,7 @@ async function createScriptList() {
             const div = document.createElement("div");
             div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
-            const script_collapse_div = createScriptCollapse(name, url, code, injectImmediately);
+            const script_collapse_div = createScriptCollapse(name, url, code, injectImmediately, options.enable_setting_inject_immediately);
             const script_buttons_div = createScriptButtons(name, url, code, enabled, i, injectImmediately);
 
             div.appendChild(script_collapse_div);
@@ -171,24 +175,29 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     return script_buttons_div;
 }
 
-function createScriptCollapse(name: string, url: string, code: string, injectImmediately: boolean): HTMLDivElement {
+function createScriptCollapse(name: string, url: string, code: string, injectImmediately: boolean, display_inject_immediately: boolean): HTMLDivElement {
     const script_collapse_div = document.createElement("div");
     script_collapse_div.tabIndex = 0;
     script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
     const script_collapse_title_div = document.createElement("div");
     script_collapse_title_div.className = "collapse-title whitespace-pre-wrap break-all";
-    script_collapse_title_div.innerText = `${name}\nURL: ${url}\nInject Immediately: `;
-    const script_inject_immediately_input = document.createElement("input");
-    script_inject_immediately_input.disabled = true;
-    script_inject_immediately_input.type = "checkbox";
-    script_inject_immediately_input.className = "checkbox checkbox-primary";
-    script_inject_immediately_input.checked = injectImmediately;
-    script_collapse_title_div.appendChild(script_inject_immediately_input);
+    if (display_inject_immediately) script_collapse_title_div.innerText = `${name}\nURL: ${url}\nInject Immediately: `;
+    else script_collapse_title_div.innerText = `${name}\nURL: ${url}`;
+    if (display_inject_immediately) {
+        const script_inject_immediately_input = document.createElement("input");
+        script_inject_immediately_input.disabled = true;
+        script_inject_immediately_input.type = "checkbox";
+        script_inject_immediately_input.className = "checkbox checkbox-primary";
+        script_inject_immediately_input.checked = injectImmediately;
+        script_collapse_title_div.appendChild(script_inject_immediately_input);
+    }
     const script_collapse_content_div = document.createElement("div");
     script_collapse_content_div.className = "collapse-content whitespace-pre-wrap break-all";
     script_collapse_content_div.innerText = code;
     script_collapse_div.appendChild(script_collapse_title_div);
     script_collapse_div.appendChild(script_collapse_content_div);
+
+
 
     return script_collapse_div;
 }
@@ -457,7 +466,7 @@ async function exportScripts() {
         const date = new Date();
         const year = date.getFullYear();
         console.log(year);
-        const month = String(date.getMonth() + 2).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
         console.log(month);
         const day = date.getDate().toString().padStart(2, "0");
         console.log(day);
@@ -564,6 +573,14 @@ function reload() {
 
     const submit_script_button = document.getElementById("submit-script") as HTMLButtonElement;
     submit_script_button.textContent = "Submit";
+
+    getAutoInjectorOptions().then((options) => {
+        if (!options.enable_setting_inject_immediately) {
+            document.getElementById("user-script-inject-immediately-label")!.style.display = "none";
+        } else {
+            document.getElementById("user-script-inject-immediately-label")!.style.display = "inline-flex";
+        }
+    });
 
     const script_div = document.getElementById("script-div") as HTMLDivElement;
     script_div.children.item(0)?.remove();
