@@ -10,6 +10,7 @@ export interface Script {
 export enum AutoInjectorMessageType {
     ErrorUpdate,
     ScriptError,
+    SettingsUpdate
 }
 
 export interface AutoInjectorMessage {

@@ -1,3 +1,4 @@
+import { AutoInjectorMessage, AutoInjectorMessageType } from "./interfaces.mjs";
 import { getAutoInjectorOptions, setAutoInjectorOptions } from "./utils.mjs";
 
 async function main() {
@@ -40,7 +41,12 @@ async function main() {
         const auto_injector_options = (await getAutoInjectorOptions())!;
         const enable_setting_inject_immediately_checkbox = document.getElementById("enable_setting_inject_immediately_checkbox") as HTMLInputElement;
         auto_injector_options.enable_setting_inject_immediately = enable_setting_inject_immediately_checkbox.checked;
-        setAutoInjectorOptions(auto_injector_options);
+        setAutoInjectorOptions(auto_injector_options).then(() => {
+            const msg: AutoInjectorMessage = {
+                type: AutoInjectorMessageType.SettingsUpdate,
+            } as AutoInjectorMessage;
+            chrome.runtime.sendMessage(msg)
+        })
     };
 }
 

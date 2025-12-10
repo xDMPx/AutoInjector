@@ -77,23 +77,21 @@ main();
 
 chrome.runtime.onMessage.addListener(async (_msg) => {
     const msg = _msg as AutoInjectorMessage;
-    if (msg.type !== AutoInjectorMessageType.ErrorUpdate) {
-        return;
-    }
+    if (msg.type === AutoInjectorMessageType.ErrorUpdate) {
+        const display_errors = document.getElementById("fab_display_errors")!;
+        const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+        if (auto_injector_scripts_errors.length > 0) {
+            display_errors.style.display = "inline-flex";
+        }
+        if (auto_injector_scripts_errors.length == 0) {
+            display_errors.style.display = "none";
+        }
 
-    const display_errors = document.getElementById("fab_display_errors")!;
-    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-    if (auto_injector_scripts_errors.length > 0) {
-        display_errors.style.display = "inline-flex";
-    }
-    if (auto_injector_scripts_errors.length == 0) {
-        display_errors.style.display = "none";
-    }
-
-    const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
-    if (error_display_modal.checkVisibility({ visibilityProperty: true })) {
-        displayErrorsModal();
-    }
+        const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
+        if (error_display_modal.checkVisibility({ visibilityProperty: true })) {
+            displayErrorsModal();
+        }
+    } else if (msg.type === AutoInjectorMessageType.SettingsUpdate) reload();
 });
 
 async function createScriptList() {

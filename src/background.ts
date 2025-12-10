@@ -161,6 +161,7 @@ function injectScript(code: string, hash: number, id: string) {
                 enum AutoInjectorMessageType {
                     ErrorUpdate,
                     ScriptError,
+                    SettingsUpdate
                 }
                 if (typeof chrome !== 'undefined') {
                     const msg: AutoInjectorMessage = {
@@ -203,6 +204,7 @@ function injectScript(code: string, hash: number, id: string) {
         (function (AutoInjectorMessageType) {
             AutoInjectorMessageType[AutoInjectorMessageType["ErrorUpdate"] = 0] = "ErrorUpdate";
             AutoInjectorMessageType[AutoInjectorMessageType["ScriptError"] = 1] = "ScriptError";
+            AutoInjectorMessageType[AutoInjectorMessageType["SettingsUpdate"] = 2] = "SettingsUpdate";
         })(AutoInjectorMessageType || (AutoInjectorMessageType = {}));
 
         if (typeof chrome !== 'undefined') { 
