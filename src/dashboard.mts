@@ -1,7 +1,12 @@
 import { AutoInjectorMessage, AutoInjectorMessageType, Script } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
-let errors_sort_by_date_ascending = true;
+enum SortOrder {
+    Ascending,
+    Descending
+}
+
+let errors_date_sort_order = SortOrder.Ascending;
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -76,9 +81,17 @@ async function main() {
 
     const error_modal_sort_by_date = document.getElementById("error_modal_sort_by_date")!;
     error_modal_sort_by_date.onclick = () => {
-        errors_sort_by_date_ascending = !errors_sort_by_date_ascending;
-        if (errors_sort_by_date_ascending) document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_upward";
-        else document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_downward";
+        switch (errors_date_sort_order) {
+            case SortOrder.Descending:
+                errors_date_sort_order = SortOrder.Ascending;
+                break;
+            case SortOrder.Ascending:
+                errors_date_sort_order = SortOrder.Descending;
+                break;
+        }
+        if (errors_date_sort_order === SortOrder.Ascending) document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_upward";
+        else if (errors_date_sort_order === SortOrder.Descending) document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_downward";
+
         displayErrorsModal();
     };
 }
@@ -261,8 +274,8 @@ async function displayErrorsModal() {
 
 async function createInjectionErrorList() {
     const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-    if (errors_sort_by_date_ascending) auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
-    else auto_injector_scripts_errors.sort((a, b) => a.timestamp - b.timestamp);
+    if (errors_date_sort_order === SortOrder.Ascending) auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
+    else if (errors_date_sort_order === SortOrder.Descending) auto_injector_scripts_errors.sort((a, b) => a.timestamp - b.timestamp);
 
     const list = document.createElement("ol");
     for (const error of auto_injector_scripts_errors) {
