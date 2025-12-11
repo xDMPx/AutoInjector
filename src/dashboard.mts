@@ -1,12 +1,14 @@
-import { AutoInjectorMessage, AutoInjectorMessageType, Script } from "./interfaces.mjs";
+import { AutoInjectorMessage, AutoInjectorMessageType, Script, ScriptError } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
 enum SortOrder {
+    None,
     Ascending,
     Descending
 }
 
 let errors_date_sort_order = SortOrder.Ascending;
+let errors_name_sort_order = SortOrder.None;
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -81,8 +83,10 @@ async function main() {
 
     const error_modal_sort_by_date = document.getElementById("error_modal_sort_by_date")!;
     error_modal_sort_by_date.onclick = () => {
+        errors_name_sort_order = SortOrder.None;
         switch (errors_date_sort_order) {
             case SortOrder.Descending:
+            case SortOrder.None:
                 errors_date_sort_order = SortOrder.Ascending;
                 break;
             case SortOrder.Ascending:
@@ -91,9 +95,31 @@ async function main() {
         }
         if (errors_date_sort_order === SortOrder.Ascending) document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_upward";
         else if (errors_date_sort_order === SortOrder.Descending) document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "arrow_downward";
+        else if (errors_date_sort_order === SortOrder.None) document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "";
 
         displayErrorsModal();
     };
+
+    const error_modal_sort_by_name = document.getElementById("error_modal_sort_by_name")!;
+    error_modal_sort_by_name.onclick = () => {
+        errors_date_sort_order = SortOrder.None;
+        document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "";
+        switch (errors_name_sort_order) {
+            case SortOrder.Descending:
+            case SortOrder.None:
+                errors_name_sort_order = SortOrder.Ascending;
+                break;
+            case SortOrder.Ascending:
+                errors_name_sort_order = SortOrder.Descending;
+                break;
+        }
+        if (errors_name_sort_order === SortOrder.Ascending) document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "arrow_upward";
+        else if (errors_name_sort_order === SortOrder.Descending) document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "arrow_downward";
+        else if (errors_name_sort_order === SortOrder.None) document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "";
+
+        displayErrorsModal();
+    };
+
 }
 
 main();
@@ -274,15 +300,29 @@ async function displayErrorsModal() {
 
 async function createInjectionErrorList() {
     const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
-    if (errors_date_sort_order === SortOrder.Ascending) auto_injector_scripts_errors.sort((a, b) => b.timestamp - a.timestamp);
-    else if (errors_date_sort_order === SortOrder.Descending) auto_injector_scripts_errors.sort((a, b) => a.timestamp - b.timestamp);
+    const scripts_errors: { script: Script, error: ScriptError }[] = (
+        await Promise.all(auto_injector_scripts_errors.map(async (se) => {
+            const script = await getAutoInjectorScriptByHash(se.hash);
+            if (script === undefined) {
+                return null;
+            }
+            return { script: script, error: se };
+        }))).filter((se) => se !== null);
+
+    if (errors_date_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.error.timestamp - a.error.timestamp);
+    else if (errors_date_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.error.timestamp - b.error.timestamp);
+
+    if (errors_name_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.script.name.localeCompare(a.script.name));
+    else if (errors_name_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.script.name.localeCompare(b.script.name));
 
     const list = document.createElement("ol");
-    for (const error of auto_injector_scripts_errors) {
+    for (const script_error of scripts_errors) {
         const list_item = document.createElement("li");
         list_item.className = "p-2";
 
-        const script = await getAutoInjectorScriptByHash(error.hash);
+        const script = script_error.script;
+        const error = script_error.error;
+
         const div = document.createElement("div");
         div.className = "alert alert-error alert-outline inline-flex w-full relative";
         div.role = "alert";
