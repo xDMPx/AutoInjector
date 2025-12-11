@@ -9,6 +9,7 @@ enum SortOrder {
 
 let errors_date_sort_order = SortOrder.Ascending;
 let errors_name_sort_order = SortOrder.None;
+let errors_url_sort_order = SortOrder.None;
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -84,6 +85,10 @@ async function main() {
     const error_modal_sort_by_date = document.getElementById("error_modal_sort_by_date")!;
     error_modal_sort_by_date.onclick = () => {
         errors_name_sort_order = SortOrder.None;
+        errors_url_sort_order = SortOrder.None;
+        document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "";
+        document.getElementById("error_modal_sort_by_url_symbol")!.innerText = "";
+
         switch (errors_date_sort_order) {
             case SortOrder.Descending:
             case SortOrder.None:
@@ -103,7 +108,10 @@ async function main() {
     const error_modal_sort_by_name = document.getElementById("error_modal_sort_by_name")!;
     error_modal_sort_by_name.onclick = () => {
         errors_date_sort_order = SortOrder.None;
+        errors_url_sort_order = SortOrder.None;
         document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "";
+        document.getElementById("error_modal_sort_by_url_symbol")!.innerText = "";
+
         switch (errors_name_sort_order) {
             case SortOrder.Descending:
             case SortOrder.None:
@@ -116,6 +124,29 @@ async function main() {
         if (errors_name_sort_order === SortOrder.Ascending) document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "arrow_upward";
         else if (errors_name_sort_order === SortOrder.Descending) document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "arrow_downward";
         else if (errors_name_sort_order === SortOrder.None) document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "";
+
+        displayErrorsModal();
+    };
+
+    const error_modal_sort_by_url = document.getElementById("error_modal_sort_by_url")!;
+    error_modal_sort_by_url.onclick = () => {
+        errors_date_sort_order = SortOrder.None;
+        errors_name_sort_order = SortOrder.None;
+        document.getElementById("error_modal_sort_by_url_symbol")!.innerText = "";
+        document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "";
+
+        switch (errors_url_sort_order) {
+            case SortOrder.Descending:
+            case SortOrder.None:
+                errors_url_sort_order = SortOrder.Ascending;
+                break;
+            case SortOrder.Ascending:
+                errors_url_sort_order = SortOrder.Descending;
+                break;
+        }
+        if (errors_url_sort_order === SortOrder.Ascending) document.getElementById("error_modal_sort_by_url_symbol")!.innerText = "arrow_upward";
+        else if (errors_url_sort_order === SortOrder.Descending) document.getElementById("error_modal_sort_by_url_symbol")!.innerText = "arrow_downward";
+        else if (errors_url_sort_order === SortOrder.None) document.getElementById("error_modal_sort_by_url_symbol")!.innerText = "";
 
         displayErrorsModal();
     };
@@ -315,6 +346,9 @@ async function createInjectionErrorList() {
 
     if (errors_name_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.script.name.localeCompare(a.script.name));
     else if (errors_name_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.script.name.localeCompare(b.script.name));
+
+    if (errors_url_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.error.message.split("http").reverse()[0].localeCompare(a.error.message.split("http").reverse()[0]));
+    else if (errors_url_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.error.message.split("http").reverse()[0].localeCompare(b.error.message.split("http").reverse()[0]));
 
     const list = document.createElement("ol");
     for (const script_error of scripts_errors) {
