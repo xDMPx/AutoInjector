@@ -191,6 +191,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
         edit_button_tooltip.setAttribute("data-tip", "Cancel edit");
         edit_button.innerHTML = "<span class=\"material-symbols-outlined\">cancel</span>";
         edit_button.className = "btn btn-secondary m-auto";
+        checkbox.disabled = true;
         editScriptMode(script_num, name, url, code, injectImmediately);
         edit_button.onclick = () => { reload() };
     };
@@ -632,6 +633,7 @@ function reload() {
     user_script_name.value = "";
     user_script_url.value = "*";
     user_script_inject_immediately.checked = false;
+    autoResizeTextArea();
 
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     submit_script_form.reset();
