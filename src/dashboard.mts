@@ -537,35 +537,54 @@ async function editScript(e: SubmitEvent, i: number) {
             e.preventDefault();
             if (e.submitter?.id === "edit_script_modal-yes") {
                 const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-                const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+                const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
                 const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
                 const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
                 const name = user_script_name.value;
-                await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
-                user_script_text.value = "";
-                user_script_name.value = "";
-                user_script_url.value = "*";
-                user_script_inject_immediately.checked = false;
 
-                shortToast(`Script "${name}" updated successfully!`);
-                reload();
+                const edited = await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
+                if (edited) {
+                    shortToast(`Script "${name}" updated successfully!`);
+                    reload();
+                } else {
+                    user_script_name.pattern = `^(?!${user_script_name.value}$).*$`;
+                    (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+                    user_script_name.oninput = () => {
+                        if (user_script_name.value.length > 2) {
+                            (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+                        } else {
+                            (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "";
+                        }
+                    }
+                    user_script_name.reportValidity();
+                }
+
             }
             edit_script_modal.close();
         };
     } else {
         const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-        const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
+        const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
         const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
         const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
         const name = user_script_name.value;
-        await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
-        user_script_text.value = "";
-        user_script_name.value = "";
-        user_script_url.value = "*";
-        user_script_inject_immediately.checked = false;
 
-        shortToast(`Script "${name}" updated successfully!`);
-        reload();
+        const edited = await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
+        if (edited) {
+            shortToast(`Script "${name}" updated successfully!`);
+            reload();
+        } else {
+            user_script_name.pattern = `^(?!${user_script_name.value}$).*$`;
+            (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+            user_script_name.oninput = () => {
+                if (user_script_name.value.length > 2) {
+                    (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+                } else {
+                    (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "";
+                }
+            }
+            user_script_name.reportValidity();
+        }
     }
 }
 

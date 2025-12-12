@@ -44,7 +44,7 @@ export async function saveAutoInjectorScript(name: string, url: string, script: 
     if (scripts === undefined) {
         scripts = [];
     }
-    if (scripts.find((s) => s.name == name) !== undefined) return false;
+    if (scripts.find((s) => s.name === name) !== undefined) return false;
 
     scripts.push({
         hash: djb2Hash(script),
@@ -71,11 +71,13 @@ export async function deleteAutoInjectorScript(i: number) {
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
-export async function editAutoInjectorScript(i: number, name: string, url: string, script: string, injectImmediately: boolean) {
+export async function editAutoInjectorScript(i: number, name: string, url: string, script: string, injectImmediately: boolean): Promise<boolean> {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
     }
+    if (scripts.find((s, j) => j !== i && s.name === name) !== undefined) return false;
+
 
     const old_hash = scripts[i].hash;
     scripts[i].name = name;
@@ -86,6 +88,8 @@ export async function editAutoInjectorScript(i: number, name: string, url: strin
 
     deletedAutoInjectorScriptErrorsForHash(old_hash);
     await chrome.storage.local.set({ "scripts": scripts });
+
+    return true;
 }
 
 export async function enableAutoInjectorScript(i: number) {
