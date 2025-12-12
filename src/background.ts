@@ -8,6 +8,7 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
         await migrateFrom021To022();
         await migrateFrom022To023();
         await migrateFrom023To024();
+        await migrateFrom024To025();
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
             saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false, false);
@@ -58,6 +59,26 @@ async function migrateFrom023To024() {
     const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: { hash: number, name: string, url: string, code: string, enabled: boolean, injectImmediately: boolean | undefined }[] | undefined };
     if (scripts === undefined) return;
     const migrated_scripts = scripts.map((s) => { if (s.injectImmediately === undefined) s.injectImmediately = false; return s; });
+    await chrome.storage.local.remove("scripts");
+    await chrome.storage.local.set({ "scripts": migrated_scripts });
+}
+
+
+async function migrateFrom024To025() {
+    const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: { hash: number, name: string, url: string, code: string, enabled: boolean, injectImmediately: boolean }[] | undefined };
+    if (scripts === undefined) return;
+
+    const names: Set<String> = new Set();
+    const migrated_scripts = [];
+    for (let script of scripts) {
+        while (names.has(script.name)) {
+            const rand = Math.floor(Math.random() * 10000);
+            script.name += `_${rand}`;
+        }
+        names.add(script.name);
+        migrated_scripts.push(script);
+    }
+
     await chrome.storage.local.remove("scripts");
     await chrome.storage.local.set({ "scripts": migrated_scripts });
 }

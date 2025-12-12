@@ -639,18 +639,29 @@ async function onImportScriptsClick() {
 }
 
 async function importScripts(data: string) {
-    const saved_scripts = (await getAutoInjectorScripts())?.map((s) => s.hash);
+    const auto_injector_scripts = await getAutoInjectorScripts()
+    const saved_scripts = (auto_injector_scripts?.map((s) => s.hash));
     const saved_scripts_hash = new Set(saved_scripts);
 
     const imported_scripts = JSON.parse(data) as { hash: number | undefined, name: string | undefined, url: string | undefined, code: string, enabled: boolean, injectImmediately: boolean | undefined }[];
     let i = (saved_scripts === undefined) ? 0 : saved_scripts.length + 1;
-    const scripts: Script[] = imported_scripts.map((s) => {
+    const migrated_scripts: Script[] = imported_scripts.map((s) => {
         if (s.name === undefined) s.name = `Script ${i++}`;
         if (s.url === undefined) s.url = "*";
         if (s.hash === undefined) s.hash = djb2Hash(s.code);
         if (s.injectImmediately === undefined) s.injectImmediately = false;
         return { hash: s.hash, name: s.name, url: s.url, code: s.code, enabled: s.enabled, injectImmediately: s.injectImmediately };
     });
+    const names: Set<String> = new Set(auto_injector_scripts?.map((s) => s.name));
+    const scripts = [];
+    for (let script of migrated_scripts) {
+        while (names.has(script.name)) {
+            const rand = Math.floor(Math.random() * 10000);
+            script.name += `_${rand}`;
+        }
+        names.add(script.name);
+        scripts.push(script);
+    }
     const duplicate_scripts: Script[] = [];
     let imported_scripts_count = 0;
     for (const script of scripts) {
