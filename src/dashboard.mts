@@ -347,8 +347,8 @@ async function createInjectionErrorList() {
     if (errors_name_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.script.name.localeCompare(a.script.name));
     else if (errors_name_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.script.name.localeCompare(b.script.name));
 
-    if (errors_url_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.error.message.split("http").reverse()[0].localeCompare(a.error.message.split("http").reverse()[0]));
-    else if (errors_url_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.error.message.split("http").reverse()[0].localeCompare(b.error.message.split("http").reverse()[0]));
+    if (errors_url_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.error.url.localeCompare(a.error.url));
+    else if (errors_url_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.error.url.localeCompare(b.error.url));
 
     const list = document.createElement("ol");
     for (const script_error of scripts_errors) {
@@ -364,7 +364,7 @@ async function createInjectionErrorList() {
         div.innerHTML = `<div class="grid">
                 <span class="font-semibold">${script?.name}</span>
                 <span>${new Date(error.timestamp)}</span>
-                <span>${error.message}</span>
+                <span>${error.message} Occured at: ${error.url}</span>
             </div>`;
 
         const dismiss_button = document.createElement("button");

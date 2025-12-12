@@ -168,7 +168,8 @@ function injectScript(code: string, hash: number, id: string) {
                         type: AutoInjectorMessageType.ScriptError,
                         scriptError: {
                             hash: hash,
-                            message: `CSP violation: directive ${e.violatedDirective} prevented injection of script at ${document.URL}`,
+                            message: `CSP violation: directive ${e.violatedDirective} prevented injection of script;`,
+                            url: document.URL,
                             timestamp: (new Date()).getTime(),
                         }
                     } as AutoInjectorMessage;
@@ -179,7 +180,8 @@ function injectScript(code: string, hash: number, id: string) {
                         type: AutoInjectorMessageType.ScriptError,
                         scriptError: {
                             hash: hash,
-                            message: `CSP violation: directive ${e.violatedDirective} prevented injection of script at ${document.URL}`,
+                            message: `CSP violation: directive ${e.violatedDirective} prevented injection of script;`,
+                            url: document.URL,
                             timestamp: (new Date()).getTime(),
                         }
                     } as AutoInjectorMessage;
@@ -212,7 +214,8 @@ function injectScript(code: string, hash: number, id: string) {
                 type: AutoInjectorMessageType.ScriptError,
                 scriptError: {
                     hash: ${hash},
-                    message: \`\${e}; Occurred at: \${document.URL}\`,
+                    message: \`\${e};\`,
+                    url: document.URL,
                     timestamp: (new Date()).getTime() 
                 }
             };
@@ -222,7 +225,8 @@ function injectScript(code: string, hash: number, id: string) {
                 type: AutoInjectorMessageType.ScriptError,
                 scriptError: {
                     hash: ${hash},
-                    message: \`\${e}; Occurred at: \${document.URL}\`,
+                    message: \`\${e};\`,
+                    url: document.URL,
                     timestamp: (new Date()).getTime() 
                 }
             };
