@@ -39,11 +39,13 @@ export async function getAutoInjectorScripts(): Promise<Script[] | undefined> {
     return scripts;
 }
 
-export async function saveAutoInjectorScript(name: string, url: string, script: string, injectImmediately: boolean, enabled: boolean = true) {
+export async function saveAutoInjectorScript(name: string, url: string, script: string, injectImmediately: boolean, enabled: boolean = true): Promise<boolean> {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
         scripts = [];
     }
+    if (scripts.find((s) => s.name == name) !== undefined) return false;
+
     scripts.push({
         hash: djb2Hash(script),
         name: name,
@@ -53,6 +55,8 @@ export async function saveAutoInjectorScript(name: string, url: string, script: 
         injectImmediately: injectImmediately
     });
     await chrome.storage.local.set({ "scripts": scripts });
+
+    return true;
 }
 
 export async function deleteAutoInjectorScript(i: number) {
@@ -195,4 +199,13 @@ export async function deletedAutoInjectorScriptErrorsForHash(hash: number) {
     } as AutoInjectorMessage;
 
     chrome.runtime.sendMessage(update_msg);
+}
+
+export async function getAutoInjectorScriptByName(name: string): Promise<Script | undefined> {
+    let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
+    if (scripts === undefined) {
+        scripts = [];
+    }
+
+    return scripts.find((s) => s.name === name)
 }

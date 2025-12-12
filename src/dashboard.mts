@@ -486,10 +486,23 @@ async function saveScript(e: SubmitEvent) {
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
     const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
-    await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
 
-    shortToast(`Script "${user_script_name.value}" saved successfully!"`);
-    reload();
+    const saved = await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
+    if (saved) {
+        shortToast(`Script "${user_script_name.value}" saved successfully!"`);
+        reload();
+    } else {
+        user_script_name.pattern = `^(?!${user_script_name.value}$).*$`;
+        (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+        user_script_name.oninput = () => {
+            if (user_script_name.value.length > 2) {
+                (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+            } else {
+                (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "";
+            }
+        }
+        user_script_name.reportValidity();
+    }
 }
 
 async function deleteScript(i: number, name: string) {
