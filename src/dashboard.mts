@@ -179,6 +179,7 @@ async function createScriptList() {
     const scripts = await getAutoInjectorScripts();
     const list = document.createElement("ol");
     list.className = "list-decimal list-outside p-1";
+    list.id = "user-script-list";
     if (scripts !== undefined) {
         for (const [i, { name, url, code, enabled, injectImmediately }] of scripts.entries()) {
             const list_item = document.createElement("li");
@@ -216,9 +217,17 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     edit_button_tooltip.className = "tooltip";
     edit_button_tooltip.setAttribute("data-tip", "Edit this script");
     const edit_button = document.createElement("button");
-    edit_button.className = "btn btn-accent m-auto";
+    edit_button.className = "btn btn-accent m-auto edit-button";
     edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
     edit_button.onclick = () => {
+        const script_list = document.getElementById("user-script-list")!;
+        for (const script of script_list?.children) {
+            const edit_button = script.getElementsByClassName("edit-button").item(0) as HTMLButtonElement | null;
+            if (edit_button == null) continue;
+            edit_button.disabled = true;
+        }
+        edit_button.disabled = false;
+
         edit_button_tooltip.setAttribute("data-tip", "Cancel edit");
         edit_button.innerHTML = "<span class=\"material-symbols-outlined\">cancel</span>";
         edit_button.className = "btn btn-secondary m-auto";
