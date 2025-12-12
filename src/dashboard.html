@@ -16,13 +16,13 @@
 <body>
     <div class="w-2/4 mx-auto">
         <form id="submit-script-form" class="grid p-4 gap-2">
-            <label class="input w-auto outline outline-offset-[unset]">
+            <label class="input validator w-auto outline outline-offset-[unset]">
                 <span class="label">Name</span>
                 <input class="validator" id="user-script-name" type="text" required placeholder="Script name"
                     minlength="3" />
                 <div class="validator-hint"></div>
             </label>
-            <label class="input w-auto outline outline-offset-[unset]">
+            <label class="input validator w-auto outline outline-offset-[unset]">
                 <span class="label whitespace-pre pr-6">URL</span>
                 <input id="user-script-url" type="text" required class="validator" placeholder="URL" value="*"
                     pattern="^[^*]*\*?$" />
