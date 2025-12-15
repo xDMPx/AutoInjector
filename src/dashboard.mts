@@ -378,7 +378,7 @@ async function createInjectionErrorList() {
 
         const dismiss_button = document.createElement("button");
         dismiss_button.className = "btn btn-sm btn-circle btn-ghost absolute right-1 top-1";
-        dismiss_button.innerText = "✕";
+        dismiss_button.innerHTML = `<span class="material-symbols-outlined">close</span>`;
         dismiss_button.onclick = async () => {
             await deleteAutoInjectorScriptErrors(error);
             list_item.remove();
