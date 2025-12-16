@@ -381,9 +381,9 @@ async function createInjectionErrorList() {
         div.className = "alert alert-error alert-outline inline-flex w-full relative";
         div.role = "alert";
         div.innerHTML = `<div class="grid">
-                <span class="font-semibold">${script?.name}</span>
-                <span>${new Date(error.timestamp)}</span>
-                <span>${error.message} Occured at: ${error.url}</span>
+                <span class="font-semibold wrap-anywhere">${script?.name}</span>
+                <span class="wrap-anywhere">${new Date(error.timestamp)}</span>
+                <span class="wrap-anywhere">${error.message} Occured at: ${error.url}</span>
             </div>`;
 
         const dismiss_button = document.createElement("button");
