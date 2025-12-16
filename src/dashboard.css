@@ -1,2 +1,42 @@
 @import "tailwindcss";
+@tailwind utilities;
 @plugin "daisyui";
+
+
+@layer utilities {
+    .script-form-input {
+        @apply input w-auto outline outline-offset-[unset];
+    }
+
+    .menu-button {
+        @apply btn btn-lg btn-circle btn-primary;
+    }
+
+    .menu-speed-dial-btn {
+        @apply btn btn-lg btn-circle;
+    }
+
+    .menu-fab {
+        @apply fab fixed bottom-[unset] top-[1rem] flex-col;
+    }
+
+    .fab-display-errors-btn {
+        @apply btn btn-lg btn-circle btn-error hidden;
+    }
+
+    .sort-errors-button {
+        @apply btn btn-sm btn-circle btn-ghost m-1;
+    }
+
+    .sort-errors-dropdown-content {
+        @apply dropdown-content menu bg-base-100 rounded-box z-1 w-30 p-2 shadow-sm;
+    }
+
+    .modal-box-h3 {
+        @apply font-bold text-lg text-center;
+    }
+
+    .modal-confirmation-form {
+        @apply flex justify-center p-4 gap-4;
+    }
+}
