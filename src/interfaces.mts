@@ -21,6 +21,7 @@ export interface AutoInjectorMessage {
 export interface AutoInjectorOptions {
     confirmation_dialog_remove: boolean
     confirmation_dialog_edit: boolean
+    confirmation_dialog_edit_cancel: boolean
     enable_remove_indent_shift_tab: boolean
     enable_insert_tab_on_tab: boolean
     enable_setting_inject_immediately: boolean

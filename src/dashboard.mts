@@ -233,16 +233,21 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
         edit_button.className = "btn btn-secondary m-auto";
         checkbox.disabled = true;
         editScriptMode(script_num, name, url, code, injectImmediately);
-        edit_button.onclick = () => {
-            const exit_edit_script_modal = document.getElementById("exit_edit_script_modal")! as HTMLDialogElement;
-            exit_edit_script_modal.showModal();
-            exit_edit_script_modal.onsubmit = async (e) => {
-                e.preventDefault();
-                if (e.submitter?.id === "exit_edit_script_modal-yes") {
-                    reload();
-                }
-                exit_edit_script_modal.close();
-            };
+        edit_button.onclick = async () => {
+            const options = await getAutoInjectorOptions();
+            if (options.confirmation_dialog_edit_cancel) {
+                const exit_edit_script_modal = document.getElementById("exit_edit_script_modal")! as HTMLDialogElement;
+                exit_edit_script_modal.showModal();
+                exit_edit_script_modal.onsubmit = async (e) => {
+                    e.preventDefault();
+                    if (e.submitter?.id === "exit_edit_script_modal-yes") {
+                        reload();
+                    }
+                    exit_edit_script_modal.close();
+                };
+            } else {
+                reload();
+            }
         };
     };
     edit_button_tooltip.appendChild(edit_button);

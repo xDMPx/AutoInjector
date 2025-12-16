@@ -39,6 +39,7 @@ async function migrateFrom021To022() {
         ai_options = {
             confirmation_dialog_remove: true,
             confirmation_dialog_edit: false,
+            confirmation_dialog_edit_cancel: true,
             enable_remove_indent_shift_tab: true,
             enable_insert_tab_on_tab: true,
             enable_setting_inject_immediately: false
@@ -81,6 +82,14 @@ async function migrateFrom024To025() {
 
     await chrome.storage.local.remove("scripts");
     await chrome.storage.local.set({ "scripts": migrated_scripts });
+
+
+    let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions };
+    console.log(ai_options);
+    if (ai_options.confirmation_dialog_edit_cancel === undefined) {
+        ai_options.confirmation_dialog_edit_cancel = true;
+        await setAutoInjectorOptions(ai_options);
+    }
 }
 
 chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {

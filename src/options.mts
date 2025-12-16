@@ -19,6 +19,16 @@ async function main() {
         auto_injector_options.confirmation_dialog_edit = edit_dialog_remove_checkbox.checked;
         setAutoInjectorOptions(auto_injector_options);
     };
+    {
+        const edit_cancel_dialog_checkbox = document.getElementById("edit_cancel_dialog_checkbox") as HTMLInputElement;
+        edit_cancel_dialog_checkbox.checked = auto_injector_options.confirmation_dialog_edit_cancel;
+        edit_cancel_dialog_checkbox.onclick = async () => {
+            const auto_injector_options = (await getAutoInjectorOptions())!;
+            const edit_cancel_dialog_checkbox = document.getElementById("edit_cancel_dialog_checkbox") as HTMLInputElement;
+            auto_injector_options.confirmation_dialog_edit_cancel = edit_cancel_dialog_checkbox.checked;
+            setAutoInjectorOptions(auto_injector_options);
+        };
+    }
     const enable_remove_indent_shift_tab_checkbox = document.getElementById("enable_remove_indent_shift_tab_checkbox") as HTMLInputElement;
     enable_remove_indent_shift_tab_checkbox.checked = auto_injector_options.enable_remove_indent_shift_tab;
     enable_remove_indent_shift_tab_checkbox.onclick = async () => {

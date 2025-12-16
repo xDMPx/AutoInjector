@@ -135,6 +135,7 @@ export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions> {
         ai_options = {
             confirmation_dialog_remove: true,
             confirmation_dialog_edit: false,
+            confirmation_dialog_edit_cancel: true,
             enable_remove_indent_shift_tab: true,
             enable_insert_tab_on_tab: true,
             enable_setting_inject_immediately: false,
