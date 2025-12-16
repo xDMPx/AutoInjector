@@ -29,7 +29,7 @@
     }
 
     .sort-errors-dropdown-content {
-        @apply dropdown-content menu bg-base-100 rounded-box z-1 w-30 p-2 shadow-sm;
+        @apply menu bg-base-100 rounded-box z-1 w-30 p-2 shadow-sm;
     }
 
     .modal-box-h3 {
