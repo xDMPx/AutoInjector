@@ -1,7 +1,15 @@
 import { AutoInjectorMessage, AutoInjectorMessageType, AutoInjectorOptions } from "./interfaces.mjs";
-import { canScriptRun, djb2Hash, getAutoInjectorScripts, saveAutoInjectorScript, saveAutoInjectorScriptError, setAutoInjectorOptions } from "./utils.mjs";
+import { canScriptRun, djb2Hash, getAutoInjectorOptions, getAutoInjectorScripts, saveAutoInjectorScript, saveAutoInjectorScriptError, setAutoInjectorOptions } from "./utils.mjs";
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
+    if (details.reason === "install") {
+        let scripts = await getAutoInjectorScripts();
+        if (scripts === undefined) {
+            saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false, false);
+        }
+        let ai_options = await getAutoInjectorOptions();
+        setAutoInjectorOptions(ai_options);
+    }
     if (details.reason === "update") {
         await migrateFrom010To020();
         await migrateFrom020To021();
