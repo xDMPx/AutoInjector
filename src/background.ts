@@ -62,6 +62,12 @@ async function migrateFrom023To024() {
     const migrated_scripts = scripts.map((s) => { if (s.injectImmediately === undefined) s.injectImmediately = false; return s; });
     await chrome.storage.local.remove("scripts");
     await chrome.storage.local.set({ "scripts": migrated_scripts });
+
+    let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions };
+    if (ai_options.enable_setting_inject_immediately === undefined) {
+        ai_options.enable_setting_inject_immediately = false;
+        await setAutoInjectorOptions(ai_options);
+    }
 }
 
 
@@ -85,7 +91,6 @@ async function migrateFrom024To025() {
 
 
     let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions };
-    console.log(ai_options);
     if (ai_options.confirmation_dialog_edit_cancel === undefined) {
         ai_options.confirmation_dialog_edit_cancel = true;
         await setAutoInjectorOptions(ai_options);
