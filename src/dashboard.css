@@ -39,4 +39,16 @@
     .modal-confirmation-form {
         @apply flex justify-center p-4 gap-4;
     }
+
+    .option-lable {
+        @apply label cursor-pointer grid grid-cols-10;
+    }
+
+    .option-lable-text {
+        @apply pr-2 col-span-9;
+    }
+
+    .option-checkbox {
+        @apply checkbox checkbox-primary justify-self-end;
+    }
 }
