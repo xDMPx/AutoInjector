@@ -51,4 +51,32 @@
     .option-checkbox {
         @apply checkbox checkbox-primary justify-self-end;
     }
+
+    .script-container-div {
+        @apply inline-flex place-items-center w-full p-4 gap-4;
+    }
+
+    .script-buttons-div {
+        @apply flex place-items-center gap-4;
+    }
+
+    .script-button {
+        @apply btn btn-accent m-auto;
+    }
+
+    .script-collapse {
+        @apply collapse collapse-arrow bg-base-100 border-base-300 border w-3/4;
+    }
+
+    .script-collapse-wrap {
+        @apply whitespace-pre-wrap break-all;
+    }
+
+    .script-error-alert {
+        @apply alert alert-error alert-outline inline-flex w-full relative;
+    }
+
+    .error-dismiss-btn {
+        @apply btn btn-sm btn-circle btn-ghost absolute right-1 top-1;
+    }
 }
