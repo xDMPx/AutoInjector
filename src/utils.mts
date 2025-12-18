@@ -47,10 +47,11 @@ export async function saveAutoInjectorScript(name: string, url: string, script: 
     if (scripts.find((s) => s.name === name) !== undefined) return false;
 
     scripts.push({
-        hash: djb2Hash(script),
+        hash: djb2Hash(name + script),
         name: name,
         url: url,
         code: script,
+        code_hash: djb2Hash(script),
         enabled: enabled,
         injectImmediately: injectImmediately
     });
@@ -80,10 +81,11 @@ export async function editAutoInjectorScript(i: number, name: string, url: strin
 
 
     const old_hash = scripts[i].hash;
+    scripts[i].hash = djb2Hash(name + script);
     scripts[i].name = name;
     scripts[i].url = url;
     scripts[i].code = script;
-    scripts[i].hash = djb2Hash(script);
+    scripts[i].code_hash = djb2Hash(script);
     scripts[i].injectImmediately = injectImmediately;
 
     deletedAutoInjectorScriptErrorsForHash(old_hash);

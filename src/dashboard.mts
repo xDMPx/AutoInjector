@@ -655,17 +655,18 @@ async function onImportScriptsClick() {
 
 async function importScripts(data: string) {
     const auto_injector_scripts = await getAutoInjectorScripts()
-    const saved_scripts = (auto_injector_scripts?.map((s) => s.hash));
+    const saved_scripts = (auto_injector_scripts?.map((s) => s.code_hash));
     const saved_scripts_hash = new Set(saved_scripts);
 
-    const imported_scripts = JSON.parse(data) as { hash: number | undefined, name: string | undefined, url: string | undefined, code: string, enabled: boolean, injectImmediately: boolean | undefined }[];
+    const imported_scripts = JSON.parse(data) as { hash: number | undefined, name: string | undefined, url: string | undefined, code: string, code_hash: number | undefined, enabled: boolean, injectImmediately: boolean | undefined }[];
     let i = (saved_scripts === undefined) ? 0 : saved_scripts.length + 1;
     const migrated_scripts: Script[] = imported_scripts.map((s) => {
         if (s.name === undefined) s.name = `Script ${i++}`;
         if (s.url === undefined) s.url = "*";
-        if (s.hash === undefined) s.hash = djb2Hash(s.code);
+        if (s.hash === undefined) s.hash = djb2Hash(s.name + s.code);
+        if (s.code_hash === undefined) s.code_hash = djb2Hash(s.code);
         if (s.injectImmediately === undefined) s.injectImmediately = false;
-        return { hash: s.hash, name: s.name, url: s.url, code: s.code, enabled: s.enabled, injectImmediately: s.injectImmediately };
+        return { hash: s.hash, name: s.name, url: s.url, code: s.code, code_hash: s.code_hash, enabled: s.enabled, injectImmediately: s.injectImmediately };
     });
     const names: Set<String> = new Set(auto_injector_scripts?.map((s) => s.name));
     const scripts = [];

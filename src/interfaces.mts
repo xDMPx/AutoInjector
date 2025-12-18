@@ -3,6 +3,7 @@ export interface Script {
     name: string,
     url: string,
     code: string,
+    code_hash: number,
     enabled: boolean,
     injectImmediately: boolean
 }
