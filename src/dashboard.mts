@@ -184,7 +184,7 @@ async function createScriptList() {
         for (const [i, { name, url, code, enabled, injectImmediately }] of scripts.entries()) {
             const list_item = document.createElement("li");
             const div = document.createElement("div");
-            div.className = "script-container-div";
+            div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
             const script_collapse_div = createScriptCollapse(name, url, code, injectImmediately, options.enable_setting_inject_immediately);
             const script_buttons_div = createScriptButtons(name, url, code, enabled, i, injectImmediately);
@@ -201,7 +201,7 @@ async function createScriptList() {
 
 function createScriptButtons(name: string, url: string, code: string, enabled: boolean, script_num: number, injectImmediately: boolean): HTMLDivElement {
     const script_buttons_div = document.createElement("div");
-    script_buttons_div.className = "script-buttons-div ";
+    script_buttons_div.className = "flex place-items-center gap-4";
 
     const checkbox_tooltip = document.createElement("div");
     checkbox_tooltip.className = "tooltip";
@@ -217,7 +217,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     edit_button_tooltip.className = "tooltip";
     edit_button_tooltip.setAttribute("data-tip", "Edit this script");
     const edit_button = document.createElement("button");
-    edit_button.className = "script-button edit-button";
+    edit_button.className = "btn btn-accent m-auto edit-button";
     edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
     edit_button.onclick = () => {
         const script_list = document.getElementById("user-script-list")!;
@@ -256,7 +256,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     copy_button_tooltip.className = "tooltip";
     copy_button_tooltip.setAttribute("data-tip", "Copy to clipboard");
     const copy_button = document.createElement("button");
-    copy_button.className = "script-button";
+    copy_button.className = "btn btn-accent m-auto";
     copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
     copy_button.onclick = () => { copyScriptToClipboard(copy_button_tooltip, copy_button, code) };
     copy_button_tooltip.appendChild(copy_button);
@@ -265,7 +265,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     delete_button_tooltip.className = "tooltip";
     delete_button_tooltip.setAttribute("data-tip", "Permanently remove this script");
     const delete_button = document.createElement("button");
-    delete_button.className = "script-button";
+    delete_button.className = "btn btn-accent m-auto ";
     delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
     delete_button.onclick = () => { deleteScript(script_num, name) };
     delete_button_tooltip.appendChild(delete_button);
@@ -281,9 +281,9 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
 function createScriptCollapse(name: string, url: string, code: string, injectImmediately: boolean, display_inject_immediately: boolean): HTMLDivElement {
     const script_collapse_div = document.createElement("div");
     script_collapse_div.tabIndex = 0;
-    script_collapse_div.className = "script-collapse";
+    script_collapse_div.className = "collapse collapse-arrow bg-base-100 border-base-300 border w-3/4 ";
     const script_collapse_title_div = document.createElement("div");
-    script_collapse_title_div.className = "collapse-title script-collapse-wrap";
+    script_collapse_title_div.className = "collapse-title whitespace-pre-wrap break-all";
     if (display_inject_immediately) script_collapse_title_div.innerText = `${name}\nURL: ${url}\nInject Immediately: `;
     else script_collapse_title_div.innerText = `${name}\nURL: ${url}`;
     if (display_inject_immediately) {
@@ -295,7 +295,7 @@ function createScriptCollapse(name: string, url: string, code: string, injectImm
         script_collapse_title_div.appendChild(script_inject_immediately_input);
     }
     const script_collapse_content_div = document.createElement("div");
-    script_collapse_content_div.className = "collapse-content script-collapse-wrap";
+    script_collapse_content_div.className = "collapse-content whitespace-pre-wrap break-all";
     script_collapse_content_div.innerText = code;
     script_collapse_div.appendChild(script_collapse_title_div);
     script_collapse_div.appendChild(script_collapse_content_div);
@@ -383,7 +383,7 @@ async function createInjectionErrorList() {
         const error = script_error.error;
 
         const div = document.createElement("div");
-        div.className = "script-error-alert";
+        div.className = "alert alert-error alert-outline inline-flex w-full relative";
         div.role = "alert";
         div.innerHTML = `<div class="grid">
                 <span class="font-semibold wrap-anywhere">${script?.name}</span>
@@ -392,7 +392,7 @@ async function createInjectionErrorList() {
             </div>`;
 
         const dismiss_button = document.createElement("button");
-        dismiss_button.className = "error-dismiss-btn";
+        dismiss_button.className = "btn btn-sm btn-circle btn-ghost absolute right-1 top-1";
         dismiss_button.innerHTML = `<span class="material-symbols-outlined">close</span>`;
         dismiss_button.onclick = async () => {
             await deleteAutoInjectorScriptErrors(error);
@@ -663,9 +663,9 @@ async function importScripts(data: string) {
     const migrated_scripts: Script[] = imported_scripts.map((s) => {
         if (s.name === undefined) s.name = `Script ${i++}`;
         if (s.url === undefined) s.url = "*";
-        if (s.hash === undefined) s.hash = djb2Hash(s.name + s.code);
-        if (s.code_hash === undefined) s.code_hash = djb2Hash(s.code);
         if (s.injectImmediately === undefined) s.injectImmediately = false;
+        s.hash = djb2Hash(s.name + s.code);
+        s.code_hash = djb2Hash(s.code);
         return { hash: s.hash, name: s.name, url: s.url, code: s.code, code_hash: s.code_hash, enabled: s.enabled, injectImmediately: s.injectImmediately };
     });
     const names: Set<String> = new Set(auto_injector_scripts?.map((s) => s.name));
