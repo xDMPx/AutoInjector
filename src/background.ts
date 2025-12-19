@@ -114,6 +114,7 @@ async function migrateFrom025To026() {
             s.hash = djb2Hash(s.name + s.code);
             s.code_hash = djb2Hash(s.code);
         }
+        return s;
     });
     await chrome.storage.local.set({ "scripts": migrated_scripts });
 }

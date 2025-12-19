@@ -182,6 +182,28 @@
     </form>
 </dialog>
 
+<dialog id="save_duplicate_script_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="modal-box-h3">
+            A script with the same code already exists.
+            Do you want to save a duplicate?
+        </h3>
+        <form>
+            <div class="modal-confirmation-form">
+                <div class="form-control">
+                    <button id="save_duplicate_script_modal-yes" class="btn btn-primary">Yes</button>
+                </div>
+                <form method="dialog">
+                    <button id="save_duplicate_script_modal-no" class="btn btn-neutral">No</button>
+                </form>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
 <dialog id="about_modal" class="modal">
     <div class="modal-box">
         <h2 class="text-lg font-bold">About</h2>

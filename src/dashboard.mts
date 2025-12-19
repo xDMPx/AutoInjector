@@ -502,21 +502,39 @@ async function saveScript(e: SubmitEvent) {
     const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
 
-    const saved = await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
-    if (saved) {
-        shortToast(`Script "${user_script_name.value}" saved successfully!"`);
-        reload();
-    } else {
-        user_script_name.pattern = `^(?!${user_script_name.value}$).*$`;
-        (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
-        user_script_name.oninput = () => {
-            if (user_script_name.value.length > 2) {
-                (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
-            } else {
-                (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "";
+    const saveScript = async () => {
+        const saved = await saveAutoInjectorScript(user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
+        if (saved) {
+            shortToast(`Script "${user_script_name.value}" saved successfully!"`);
+            reload();
+        } else {
+            user_script_name.pattern = `^(?!${user_script_name.value}$).*$`;
+            (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+            user_script_name.oninput = () => {
+                if (user_script_name.value.length > 2) {
+                    (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
+                } else {
+                    (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "";
+                }
             }
+            user_script_name.reportValidity();
         }
-        user_script_name.reportValidity();
+    };
+
+    const scripts = await getAutoInjectorScripts();
+    if (scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value)) !== undefined) {
+        const save_duplicate_script_modal = document.getElementById("save_duplicate_script_modal")! as HTMLDialogElement;
+        save_duplicate_script_modal.showModal();
+        save_duplicate_script_modal.onsubmit = async (e) => {
+            e.preventDefault();
+            if (e.submitter?.id === "save_duplicate_script_modal-yes") {
+                saveScript();
+            }
+            save_duplicate_script_modal.close();
+
+        }
+    } else {
+        saveScript();
     }
 }
 
