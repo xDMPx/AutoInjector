@@ -254,8 +254,7 @@ function injectScript(code: string, hash: number, id: string) {
     script.type = "text/javascript";
     script.id = `autoinjector-script-${hash}`;
     script.text = `
-    try { ${code} }
-    catch (e) { 
+    function autoInjectorLogError(e) {
         console.error(\`AutoInjector; Error \${e}\`); 
 
         var AutoInjectorMessageType;
@@ -289,7 +288,9 @@ function injectScript(code: string, hash: number, id: string) {
             const event = new CustomEvent("AutoInjectorError", { detail: msg });
             window.dispatchEvent(event);
         }
-    }`;
+    }
+    try { ${code} }
+    catch (e) { autoInjectorLogError(e) } `;
     document.body.appendChild(script);
     console.log(script);
 }
