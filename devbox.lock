@@ -2,13 +2,13 @@
   "lockfile_version": "1",
   "packages": {
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
-      "last_modified": "2025-12-15T04:22:15Z",
-      "resolved": "github:NixOS/nixpkgs/09b8fda8959d761445f12b55f380d90375a1d6bb?lastModified=1765772535&narHash=sha256-aq%2BdQoaPONOSjtFIBnAXseDm9TUhIbe215TPmkfMYww%3D"
+      "last_modified": "2025-12-21T10:48:17Z",
+      "resolved": "github:NixOS/nixpkgs/306ea70f9eb0fb4e040f8540e2deab32ed7e2055?lastModified=1766314097&narHash=sha256-laJftWbghBehazn%2FzxVJ8NdENVgjccsWAdAqKXhErrM%3D"
     },
     "nodejs@latest": {
-      "last_modified": "2025-12-04T22:20:37Z",
+      "last_modified": "2025-12-16T16:49:59Z",
       "plugin_version": "0.0.2",
-      "resolved": "github:NixOS/nixpkgs/bd88d6c13ab85cc842b93d53f68d6d40412e5a18#nodejs_25",
+      "resolved": "github:NixOS/nixpkgs/e8d16d2186d6ed9f047eb30948e97e7e01886d10#nodejs_25",
       "source": "devbox-search",
       "version": "25.2.1",
       "systems": {
@@ -38,12 +38,12 @@
               "default": true
             },
             {
-              "name": "libv8",
-              "path": "/nix/store/rsw8xhjxzqsxpcwwby8819v44amghf0k-nodejs-25.2.1-libv8"
-            },
-            {
               "name": "dev",
               "path": "/nix/store/m6acblwai1s839p5g1k9iqirxcfjf1mw-nodejs-25.2.1-dev"
+            },
+            {
+              "name": "libv8",
+              "path": "/nix/store/rsw8xhjxzqsxpcwwby8819v44amghf0k-nodejs-25.2.1-libv8"
             }
           ],
           "store_path": "/nix/store/aw0laz6a55b5msgi8lal0jdla2qb2nn1-nodejs-25.2.1"
@@ -56,12 +56,12 @@
               "default": true
             },
             {
-              "name": "dev",
-              "path": "/nix/store/2zcdnvf7bm8jkzy9pd3rlihgvz8x7rh4-nodejs-25.2.1-dev"
-            },
-            {
               "name": "libv8",
               "path": "/nix/store/7c92hcl3b25cn2zc2j2fpffzwrnm2dls-nodejs-25.2.1-libv8"
+            },
+            {
+              "name": "dev",
+              "path": "/nix/store/2zcdnvf7bm8jkzy9pd3rlihgvz8x7rh4-nodejs-25.2.1-dev"
             }
           ],
           "store_path": "/nix/store/8andhdv8bvlnx8935r9qzkzkavbg8yx0-nodejs-25.2.1"
