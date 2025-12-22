@@ -568,40 +568,7 @@ async function deleteScript(i: number, name: string) {
 
 async function editScript(e: SubmitEvent, i: number) {
     e.preventDefault();
-    const options = await getAutoInjectorOptions();
-    if (options.confirmation_dialog_edit) {
-        const edit_script_modal = document.getElementById("edit_script_modal")! as HTMLDialogElement;
-        edit_script_modal.showModal();
-        edit_script_modal.onsubmit = async (e) => {
-            e.preventDefault();
-            if (e.submitter?.id === "edit_script_modal-yes") {
-                const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-                const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
-                const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
-                const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
-                const name = user_script_name.value;
-
-                const edited = await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
-                if (edited) {
-                    shortToast(`Script "${name}" updated successfully!`);
-                    reload();
-                } else {
-                    user_script_name.pattern = `^(?!${user_script_name.value}$).*$`;
-                    (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
-                    user_script_name.oninput = () => {
-                        if (user_script_name.value.length > 2) {
-                            (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "Script name must be unique";
-                        } else {
-                            (user_script_name.nextElementSibling! as HTMLDivElement).innerText = "";
-                        }
-                    }
-                    user_script_name.reportValidity();
-                }
-
-            }
-            edit_script_modal.close();
-        };
-    } else {
+    const editScript = async () => {
         const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
         const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
         const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
@@ -623,6 +590,67 @@ async function editScript(e: SubmitEvent, i: number) {
                 }
             }
             user_script_name.reportValidity();
+        }
+
+
+    };
+    const options = await getAutoInjectorOptions();
+    if (options.warn_about_dupilcate_scripts) {
+        const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+        const scripts = await getAutoInjectorScripts();
+        const hash = scripts?.at(i)?.hash;
+        if (scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value) && s.hash !== hash) !== undefined) {
+            const save_duplicate_script_modal = document.getElementById("save_duplicate_script_modal")! as HTMLDialogElement;
+            save_duplicate_script_modal.showModal();
+            save_duplicate_script_modal.onsubmit = async (e) => {
+                e.preventDefault();
+                if (e.submitter?.id === "save_duplicate_script_modal-yes") {
+                    if (options.confirmation_dialog_edit) {
+                        const edit_script_modal = document.getElementById("edit_script_modal")! as HTMLDialogElement;
+                        edit_script_modal.showModal();
+                        edit_script_modal.onsubmit = async (e) => {
+                            e.preventDefault();
+                            if (e.submitter?.id === "edit_script_modal-yes") {
+                                await editScript();
+                            }
+                            edit_script_modal.close();
+                        };
+                    } else {
+                        await editScript();
+                    }
+                }
+                save_duplicate_script_modal.close();
+
+            }
+        }
+        else {
+            if (options.confirmation_dialog_edit) {
+                const edit_script_modal = document.getElementById("edit_script_modal")! as HTMLDialogElement;
+                edit_script_modal.showModal();
+                edit_script_modal.onsubmit = async (e) => {
+                    e.preventDefault();
+                    if (e.submitter?.id === "edit_script_modal-yes") {
+                        await editScript();
+                    }
+                    edit_script_modal.close();
+                };
+            } else {
+                await editScript();
+            }
+        }
+    } else {
+        if (options.confirmation_dialog_edit) {
+            const edit_script_modal = document.getElementById("edit_script_modal")! as HTMLDialogElement;
+            edit_script_modal.showModal();
+            edit_script_modal.onsubmit = async (e) => {
+                e.preventDefault();
+                if (e.submitter?.id === "edit_script_modal-yes") {
+                    await editScript();
+                }
+                edit_script_modal.close();
+            };
+        } else {
+            await editScript();
         }
     }
 }
