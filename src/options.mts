@@ -58,6 +58,15 @@ async function main() {
             chrome.runtime.sendMessage(msg)
         })
     };
+
+    const warn_about_dupilcate_scripts_checkbox = document.getElementById("warn_about_dupilcate_scripts_checkbox") as HTMLInputElement;
+    warn_about_dupilcate_scripts_checkbox.checked = auto_injector_options.warn_about_dupilcate_scripts;
+    warn_about_dupilcate_scripts_checkbox.onclick = async () => {
+        const auto_injector_options = (await getAutoInjectorOptions())!;
+        const warn_about_dupilcate_scripts_checkbox = document.getElementById("warn_about_dupilcate_scripts_checkbox") as HTMLInputElement;
+        auto_injector_options.warn_about_dupilcate_scripts = warn_about_dupilcate_scripts_checkbox.checked;
+        setAutoInjectorOptions(auto_injector_options);
+    };
 }
 
 main();

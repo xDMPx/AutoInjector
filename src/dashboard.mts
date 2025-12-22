@@ -521,17 +521,23 @@ async function saveScript(e: SubmitEvent) {
         }
     };
 
-    const scripts = await getAutoInjectorScripts();
-    if (scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value)) !== undefined) {
-        const save_duplicate_script_modal = document.getElementById("save_duplicate_script_modal")! as HTMLDialogElement;
-        save_duplicate_script_modal.showModal();
-        save_duplicate_script_modal.onsubmit = async (e) => {
-            e.preventDefault();
-            if (e.submitter?.id === "save_duplicate_script_modal-yes") {
-                saveScript();
-            }
-            save_duplicate_script_modal.close();
+    const options = await getAutoInjectorOptions();
+    if (options.warn_about_dupilcate_scripts) {
+        const scripts = await getAutoInjectorScripts();
+        if (scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value)) !== undefined) {
+            const save_duplicate_script_modal = document.getElementById("save_duplicate_script_modal")! as HTMLDialogElement;
+            save_duplicate_script_modal.showModal();
+            save_duplicate_script_modal.onsubmit = async (e) => {
+                e.preventDefault();
+                if (e.submitter?.id === "save_duplicate_script_modal-yes") {
+                    saveScript();
+                }
+                save_duplicate_script_modal.close();
 
+            }
+        }
+        else {
+            saveScript();
         }
     } else {
         saveScript();

@@ -26,6 +26,7 @@ export interface AutoInjectorOptions {
     enable_remove_indent_shift_tab: boolean
     enable_insert_tab_on_tab: boolean
     enable_setting_inject_immediately: boolean
+    warn_about_dupilcate_scripts: boolean
 }
 
 export interface ScriptError {

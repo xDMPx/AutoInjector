@@ -141,6 +141,7 @@ export async function getAutoInjectorOptions(): Promise<AutoInjectorOptions> {
             enable_remove_indent_shift_tab: true,
             enable_insert_tab_on_tab: true,
             enable_setting_inject_immediately: false,
+            warn_about_dupilcate_scripts: true
         }
     }
 
