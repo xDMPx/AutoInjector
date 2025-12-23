@@ -181,13 +181,13 @@ async function createScriptList() {
     list.className = "list-decimal list-outside p-1";
     list.id = "user-script-list";
     if (scripts !== undefined) {
-        for (const [i, { name, url, code, enabled, injectImmediately }] of scripts.entries()) {
+        for (const { hash, name, url, code, enabled, injectImmediately } of scripts) {
             const list_item = document.createElement("li");
             const div = document.createElement("div");
             div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
             const script_collapse_div = createScriptCollapse(name, url, code, injectImmediately, options.enable_setting_inject_immediately);
-            const script_buttons_div = createScriptButtons(name, url, code, enabled, i, injectImmediately);
+            const script_buttons_div = createScriptButtons(hash, name, url, code, enabled, injectImmediately);
 
             div.appendChild(script_collapse_div);
             div.appendChild(script_buttons_div);
@@ -199,7 +199,7 @@ async function createScriptList() {
     return list;
 }
 
-function createScriptButtons(name: string, url: string, code: string, enabled: boolean, script_num: number, injectImmediately: boolean): HTMLDivElement {
+function createScriptButtons(hash: number, name: string, url: string, code: string, enabled: boolean, injectImmediately: boolean): HTMLDivElement {
     const script_buttons_div = document.createElement("div");
     script_buttons_div.className = "flex place-items-center gap-4";
 
@@ -210,7 +210,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     checkbox.type = "checkbox";
     checkbox.checked = enabled;
     checkbox.className = "checkbox checkbox-primary my-auto";
-    checkbox.onclick = () => { toggleScriptEnabled(script_num, checkbox.checked) };
+    checkbox.onclick = () => { toggleScriptEnabled(hash, checkbox.checked) };
     checkbox_tooltip.appendChild(checkbox);
 
     const edit_button_tooltip = document.createElement("div");
@@ -232,7 +232,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
         edit_button.innerHTML = "<span class=\"material-symbols-outlined\">cancel</span>";
         edit_button.className = "btn btn-secondary m-auto";
         checkbox.disabled = true;
-        editScriptMode(script_num, name, url, code, injectImmediately);
+        editScriptMode(hash, name, url, code, injectImmediately);
         edit_button.onclick = async () => {
             const options = await getAutoInjectorOptions();
             if (options.confirmation_dialog_edit_cancel) {
@@ -267,7 +267,7 @@ function createScriptButtons(name: string, url: string, code: string, enabled: b
     const delete_button = document.createElement("button");
     delete_button.className = "btn btn-accent m-auto ";
     delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
-    delete_button.onclick = () => { deleteScript(script_num, name) };
+    delete_button.onclick = () => { deleteScript(hash, name) };
     delete_button_tooltip.appendChild(delete_button);
 
     script_buttons_div.appendChild(checkbox_tooltip);
@@ -305,7 +305,7 @@ function createScriptCollapse(name: string, url: string, code: string, injectImm
     return script_collapse_div;
 }
 
-function editScriptMode(i: number, name: string, url: string, script: string, injectImmediately: boolean) {
+function editScriptMode(hash: number, name: string, url: string, script: string, injectImmediately: boolean) {
     const user_script_name = document.getElementById("user-script-name") as HTMLTextAreaElement;
     const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
     const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
@@ -314,7 +314,7 @@ function editScriptMode(i: number, name: string, url: string, script: string, in
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     user_script_text.style.height = 'auto';
     submit_script_button.textContent = "Save";
-    submit_script_form.onsubmit = (e) => { editScript(e, i) };
+    submit_script_form.onsubmit = (e) => { editScript(e, hash) };
     user_script_text.value = script;
     user_script_text.style.height = `${user_script_text.scrollHeight}px`;
     user_script_name.value = name;
@@ -549,7 +549,7 @@ async function saveScript(e: SubmitEvent) {
     }
 }
 
-async function deleteScript(i: number, name: string) {
+async function deleteScript(hash: number, name: string) {
     const options = await getAutoInjectorOptions();
     if (options.confirmation_dialog_remove) {
         const delete_script_modal = document.getElementById("delete_script_modal")! as HTMLDialogElement;
@@ -557,7 +557,7 @@ async function deleteScript(i: number, name: string) {
         delete_script_modal.onsubmit = async (e) => {
             e.preventDefault();
             if (e.submitter?.id === "delete_script_modal-yes") {
-                await deleteAutoInjectorScript(i);
+                await deleteAutoInjectorScript(hash);
 
                 shortToast(`Script "${name}" removed successfully!`);
                 reload();
@@ -565,13 +565,13 @@ async function deleteScript(i: number, name: string) {
             delete_script_modal.close();
         };
     } else {
-        await deleteAutoInjectorScript(i);
+        await deleteAutoInjectorScript(hash);
         shortToast(`Script "${name}" removed successfully!`);
         reload();
     }
 }
 
-async function editScript(e: SubmitEvent, i: number) {
+async function editScript(e: SubmitEvent, hash: number) {
     e.preventDefault();
     const editScript = async () => {
         const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
@@ -580,7 +580,7 @@ async function editScript(e: SubmitEvent, i: number) {
         const user_script_url = document.getElementById("user-script-url") as HTMLTextAreaElement;
         const name = user_script_name.value;
 
-        const edited = await editAutoInjectorScript(i, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
+        const edited = await editAutoInjectorScript(hash, user_script_name.value, user_script_url.value, user_script_text.value, user_script_inject_immediately.checked);
         if (edited) {
             shortToast(`Script "${name}" updated successfully!`);
             reload();
@@ -602,9 +602,10 @@ async function editScript(e: SubmitEvent, i: number) {
     const options = await getAutoInjectorOptions();
     if (options.warn_about_dupilcate_scripts) {
         const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
+        const script = await getAutoInjectorScriptByHash(hash);
+        const script_hash = script?.hash;
         const scripts = await getAutoInjectorScripts();
-        const hash = scripts?.at(i)?.hash;
-        const duplicate_script = scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value) && s.hash !== hash)
+        const duplicate_script = scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value) && s.hash !== script_hash)
         if (duplicate_script !== undefined) {
             const save_duplicate_script_modal = document.getElementById("save_duplicate_script_modal")! as HTMLDialogElement;
             const modal_text = save_duplicate_script_modal.getElementsByClassName("modal-box-h3").item(0)!;
@@ -665,11 +666,11 @@ async function editScript(e: SubmitEvent, i: number) {
     }
 }
 
-async function toggleScriptEnabled(i: number, enabled: boolean) {
+async function toggleScriptEnabled(hash: number, enabled: boolean) {
     if (enabled) {
-        await enableAutoInjectorScript(i);
+        await enableAutoInjectorScript(hash);
     } else {
-        await disableAutoInjectorScript(i);
+        await disableAutoInjectorScript(hash);
     }
     reload();
 }
