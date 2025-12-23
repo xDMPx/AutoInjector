@@ -524,8 +524,13 @@ async function saveScript(e: SubmitEvent) {
     const options = await getAutoInjectorOptions();
     if (options.warn_about_dupilcate_scripts) {
         const scripts = await getAutoInjectorScripts();
-        if (scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value)) !== undefined) {
+        const duplicate_script = scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value))
+        if (duplicate_script !== undefined) {
             const save_duplicate_script_modal = document.getElementById("save_duplicate_script_modal")! as HTMLDialogElement;
+            const modal_text = save_duplicate_script_modal.getElementsByClassName("modal-box-h3").item(0)!;
+            const duplicate_script_name = (await getAutoInjectorScriptByHash(duplicate_script.hash))?.name!;
+            modal_text.textContent = modal_text.textContent.replace("{}", duplicate_script_name);
+
             save_duplicate_script_modal.showModal();
             save_duplicate_script_modal.onsubmit = async (e) => {
                 e.preventDefault();
@@ -599,8 +604,13 @@ async function editScript(e: SubmitEvent, i: number) {
         const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
         const scripts = await getAutoInjectorScripts();
         const hash = scripts?.at(i)?.hash;
-        if (scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value) && s.hash !== hash) !== undefined) {
+        const duplicate_script = scripts?.find((s) => s.code_hash === djb2Hash(user_script_text.value) && s.hash !== hash)
+        if (duplicate_script !== undefined) {
             const save_duplicate_script_modal = document.getElementById("save_duplicate_script_modal")! as HTMLDialogElement;
+            const modal_text = save_duplicate_script_modal.getElementsByClassName("modal-box-h3").item(0)!;
+            const duplicate_script_name = (await getAutoInjectorScriptByHash(duplicate_script.hash))?.name!;
+            modal_text.textContent = modal_text.textContent.replace("{}", duplicate_script_name);
+
             save_duplicate_script_modal.showModal();
             save_duplicate_script_modal.onsubmit = async (e) => {
                 e.preventDefault();
