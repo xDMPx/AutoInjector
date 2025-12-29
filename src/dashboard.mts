@@ -53,6 +53,10 @@ async function main() {
     const import_button = document.getElementById("btn_import")!;
     import_button.onclick = onImportScriptsClick;
 
+    const btn_disable_all = document.getElementById("btn_disable_all")!;
+    btn_disable_all.onclick = onDisableAllClick;
+
+
     const options_button = document.getElementById("btn_options")!;
     options_button.onclick = () => {
         chrome.runtime.openOptionsPage();
@@ -673,6 +677,15 @@ async function toggleScriptEnabled(hash: number, enabled: boolean) {
         await disableAutoInjectorScript(hash);
     }
     reload();
+}
+
+
+async function onDisableAllClick() {
+    let scripts = await getAutoInjectorScripts();
+    if (scripts === undefined) return;
+    for (const script of scripts) {
+        disableAutoInjectorScript(script.hash);
+    }
 }
 
 async function exportScripts() {
