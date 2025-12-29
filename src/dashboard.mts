@@ -11,6 +11,8 @@ let errors_date_sort_order = SortOrder.Ascending;
 let errors_name_sort_order = SortOrder.None;
 let errors_url_sort_order = SortOrder.None;
 
+let errors_filter_by_name: String | null = null;
+
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
     script_div.appendChild(await createScriptList());
@@ -327,6 +329,7 @@ function editScriptMode(hash: number, name: string, url: string, script: string,
 }
 
 async function displayErrorsModal() {
+    createInjectionErrorFilters();
     const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
     error_display_modal.showModal();
     // Fix for open by default dropdown
@@ -358,7 +361,8 @@ async function displayErrorsModal() {
 
 }
 
-async function createInjectionErrorList() {
+async function createInjectionErrorFilters() {
+    const error_modal_filter_by_name = document.getElementById("error_modal_filter_by_name")! as HTMLDivElement;
     const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
     const scripts_errors: { script: Script, error: ScriptError }[] = (
         await Promise.all(auto_injector_scripts_errors.map(async (se) => {
@@ -368,6 +372,58 @@ async function createInjectionErrorList() {
             }
             return { script: script, error: se };
         }))).filter((se) => se !== null);
+
+    error_modal_filter_by_name.innerHTML = `<div>Name:</div>`;
+
+    const script_names = new Set(scripts_errors.map((se) => se.script.name));
+    for (const script_name of script_names) {
+        const div = document.createElement("div");
+        div.className = "inline-flex gap-2";
+
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "name-filter-radio";
+        radio.className = "radio radio-xs my-auto";
+        radio.value = `${script_name}`;
+        if (errors_filter_by_name === script_name) radio.checked = true;
+        radio.onclick = () => {
+            if (radio.checked && radio.value !== errors_filter_by_name) {
+                errors_filter_by_name = radio.value;
+            } else if (radio.checked && radio.value === errors_filter_by_name) {
+                radio.checked = false;
+                errors_filter_by_name = null;
+            }
+            displayErrorsModal();
+        }
+
+        const name = document.createElement("span");
+        name.textContent = `${script_name}`;
+        name.onclick = () => {
+            radio.click();
+        }
+        name.className = "my-auto";
+
+        div.appendChild(radio);
+        div.appendChild(name);
+        error_modal_filter_by_name.appendChild(div);
+    }
+}
+
+async function createInjectionErrorList() {
+    const auto_injector_scripts_errors = await getAutoInjectorScriptErrors();
+    const scripts_errors: { script: Script, error: ScriptError }[] = (
+        await Promise.all(auto_injector_scripts_errors.map(async (se) => {
+            const script = await getAutoInjectorScriptByHash(se.hash);
+            if (script === undefined) {
+                return null;
+            }
+            return { script: script, error: se };
+        }))).filter((se) => se !== null).filter((se) => {
+            if (errors_filter_by_name === null) return true;
+            else {
+                return se.script.name === errors_filter_by_name;
+            }
+        });
 
     if (errors_date_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.error.timestamp - a.error.timestamp);
     else if (errors_date_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.error.timestamp - b.error.timestamp);

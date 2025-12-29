@@ -28,8 +28,16 @@
         @apply btn btn-sm btn-circle btn-ghost m-1;
     }
 
+    .filter-errors-button {
+        @apply btn btn-sm btn-circle btn-ghost m-1;
+    }
+
     .sort-errors-dropdown-content {
         @apply menu bg-base-100 rounded-box z-1 w-30 p-2 shadow-sm;
+    }
+
+    .filter-errors-dropdown-content {
+        @apply bg-base-100 rounded-box z-1 w-30 p-2 shadow-sm;
     }
 
     .modal-box-h3 {

@@ -285,36 +285,51 @@
     <div class="modal-box">
         <div class="flex">
             <h2 class="text-lg font-bold">Scripts Injection Errors</h2>
-            <div class="dropdown dropdown-end ml-auto">
-                <div tabindex="0" role="button" class="sort-errors-button">
-                    <span class="material-symbols-outlined">
-                        sort
-                    </span>
+            <div class="ml-auto">
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="filter-errors-button ">
+                        <span class="material-symbols-outlined">
+                            filter_alt
+                        </span>
+                    </div>
+                    <ul tabindex="-1" class="dropdown-content filter-errors-dropdown-content">
+                        <li>
+                            <div id="error_modal_filter_by_name" class="flex flex-col gap-2">
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <ul tabindex="-1" class="dropdown-content sort-errors-dropdown-content">
-                    <li id="error_modal_sort_by_date" class="inline-flex">
-                        <div class="mx-auto">
-                            <div>Date</div>
-                            <div id="error_modal_sort_by_date_symbol" class="material-symbols-outlined">
-                                arrow_upward
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button" class="sort-errors-button">
+                        <span class="material-symbols-outlined">
+                            sort
+                        </span>
+                    </div>
+                    <ul tabindex="-1" class="dropdown-content sort-errors-dropdown-content">
+                        <li id="error_modal_sort_by_date" class="inline-flex">
+                            <div class="mx-auto">
+                                <div>Date</div>
+                                <div id="error_modal_sort_by_date_symbol" class="material-symbols-outlined">
+                                    arrow_upward
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                    <li id="error_modal_sort_by_name" class="inline-flex">
-                        <div class="mx-auto">
-                            <div>Name</div>
-                            <div id="error_modal_sort_by_name_symbol" class="material-symbols-outlined">
+                        </li>
+                        <li id="error_modal_sort_by_name" class="inline-flex">
+                            <div class="mx-auto">
+                                <div>Name</div>
+                                <div id="error_modal_sort_by_name_symbol" class="material-symbols-outlined">
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                    <li id="error_modal_sort_by_url" class="inline-flex">
-                        <div class="mx-auto">
-                            <div>URL</div>
-                            <div id="error_modal_sort_by_url_symbol" class="material-symbols-outlined">
+                        </li>
+                        <li id="error_modal_sort_by_url" class="inline-flex">
+                            <div class="mx-auto">
+                                <div>URL</div>
+                                <div id="error_modal_sort_by_url_symbol" class="material-symbols-outlined">
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div id="script_injection_errors">
