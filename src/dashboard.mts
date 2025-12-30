@@ -12,7 +12,7 @@ let errors_name_sort_order = SortOrder.None;
 let errors_url_sort_order = SortOrder.None;
 
 let errors_filter_by_name: String | null = null;
-let errors_filter_by_url: String | null = null;
+let errors_filter_by_domain: String | null = null;
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -394,7 +394,7 @@ async function createInjectionErrorFilters() {
                 radio.checked = false;
                 errors_filter_by_name = null;
             }
-            errors_filter_by_url = null;
+            errors_filter_by_domain = null;
             displayErrorsModal();
         }
 
@@ -410,10 +410,14 @@ async function createInjectionErrorFilters() {
         error_modal_filter_by_name.appendChild(div);
     }
 
-    const error_modal_filter_by_url = document.getElementById("error_modal_filter_by_url")! as HTMLDivElement;
-    error_modal_filter_by_url.innerHTML = `<div>URL:</div>`;
-    const script_urls = new Set(scripts_errors.map((se) => se.error.url));
-    for (const script_url of script_urls) {
+    const error_modal_filter_by_domain = document.getElementById("error_modal_filter_by_domain")! as HTMLDivElement;
+    error_modal_filter_by_domain.innerHTML = `<div>URL:</div>`;
+    const script_domains = new Set(scripts_errors.map((se) => {
+        let url = se.error.url;
+        let domain = url.replace(new RegExp("https*://"), "").replace(new RegExp("/.*"), "").trim();
+        return domain;
+    }));
+    for (const script_domain of script_domains) {
         const div = document.createElement("div");
         div.className = "inline-flex gap-2";
 
@@ -421,21 +425,21 @@ async function createInjectionErrorFilters() {
         radio.type = "radio";
         radio.name = "name-filter-radio";
         radio.className = "radio radio-xs my-auto";
-        radio.value = `${script_url}`;
-        if (errors_filter_by_url === script_url) radio.checked = true;
+        radio.value = `${script_domain}`;
+        if (errors_filter_by_domain === script_domain) radio.checked = true;
         radio.onclick = () => {
-            if (radio.checked && radio.value !== errors_filter_by_url) {
-                errors_filter_by_url = radio.value;
-            } else if (radio.checked && radio.value === errors_filter_by_url) {
+            if (radio.checked && radio.value !== errors_filter_by_domain) {
+                errors_filter_by_domain = radio.value;
+            } else if (radio.checked && radio.value === errors_filter_by_domain) {
                 radio.checked = false;
-                errors_filter_by_url = null;
+                errors_filter_by_domain = null;
             }
             errors_filter_by_name = null;
             displayErrorsModal();
         }
 
         const name = document.createElement("span");
-        name.textContent = `${script_url}`;
+        name.textContent = `${script_domain}`;
         name.onclick = () => {
             radio.click();
         }
@@ -443,7 +447,7 @@ async function createInjectionErrorFilters() {
 
         div.appendChild(radio);
         div.appendChild(name);
-        error_modal_filter_by_url.appendChild(div);
+        error_modal_filter_by_domain.appendChild(div);
     }
 }
 
@@ -465,9 +469,11 @@ async function createInjectionErrorList() {
             }
         })
         .filter((se) => {
-            if (errors_filter_by_url === null) return true;
+            if (errors_filter_by_domain === null) return true;
             else {
-                return se.error.url === errors_filter_by_url;
+                let url = se.error.url;
+                let domain = url.replace(new RegExp("https*://"), "").replace(new RegExp("/.*"), "").trim();
+                return domain === errors_filter_by_domain;
             }
         })
         ;
