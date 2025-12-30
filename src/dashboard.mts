@@ -12,6 +12,7 @@ let errors_name_sort_order = SortOrder.None;
 let errors_url_sort_order = SortOrder.None;
 
 let errors_filter_by_name: String | null = null;
+let errors_filter_by_url: String | null = null;
 
 async function main() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
@@ -393,6 +394,7 @@ async function createInjectionErrorFilters() {
                 radio.checked = false;
                 errors_filter_by_name = null;
             }
+            errors_filter_by_url = null;
             displayErrorsModal();
         }
 
@@ -407,6 +409,42 @@ async function createInjectionErrorFilters() {
         div.appendChild(name);
         error_modal_filter_by_name.appendChild(div);
     }
+
+    const error_modal_filter_by_url = document.getElementById("error_modal_filter_by_url")! as HTMLDivElement;
+    error_modal_filter_by_url.innerHTML = `<div>URL:</div>`;
+    const script_urls = new Set(scripts_errors.map((se) => se.error.url));
+    for (const script_url of script_urls) {
+        const div = document.createElement("div");
+        div.className = "inline-flex gap-2";
+
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "name-filter-radio";
+        radio.className = "radio radio-xs my-auto";
+        radio.value = `${script_url}`;
+        if (errors_filter_by_url === script_url) radio.checked = true;
+        radio.onclick = () => {
+            if (radio.checked && radio.value !== errors_filter_by_url) {
+                errors_filter_by_url = radio.value;
+            } else if (radio.checked && radio.value === errors_filter_by_url) {
+                radio.checked = false;
+                errors_filter_by_url = null;
+            }
+            errors_filter_by_name = null;
+            displayErrorsModal();
+        }
+
+        const name = document.createElement("span");
+        name.textContent = `${script_url}`;
+        name.onclick = () => {
+            radio.click();
+        }
+        name.className = "my-auto";
+
+        div.appendChild(radio);
+        div.appendChild(name);
+        error_modal_filter_by_url.appendChild(div);
+    }
 }
 
 async function createInjectionErrorList() {
@@ -418,12 +456,21 @@ async function createInjectionErrorList() {
                 return null;
             }
             return { script: script, error: se };
-        }))).filter((se) => se !== null).filter((se) => {
+        })))
+        .filter((se) => se !== null).
+        filter((se) => {
             if (errors_filter_by_name === null) return true;
             else {
                 return se.script.name === errors_filter_by_name;
             }
-        });
+        })
+        .filter((se) => {
+            if (errors_filter_by_url === null) return true;
+            else {
+                return se.error.url === errors_filter_by_url;
+            }
+        })
+        ;
 
     if (errors_date_sort_order === SortOrder.Ascending) scripts_errors.sort((a, b) => b.error.timestamp - a.error.timestamp);
     else if (errors_date_sort_order === SortOrder.Descending) scripts_errors.sort((a, b) => a.error.timestamp - b.error.timestamp);

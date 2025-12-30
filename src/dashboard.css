@@ -37,7 +37,7 @@
     }
 
     .filter-errors-dropdown-content {
-        @apply bg-base-100 rounded-box z-1 w-30 p-2 shadow-sm;
+        @apply bg-base-100 rounded-box z-1 p-2 shadow-sm;
     }
 
     .modal-box-h3 {
