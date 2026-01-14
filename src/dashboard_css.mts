@@ -1,4 +1,4 @@
-import { getAutoInjectorUserCSS } from "./utils.mjs";
+import { disableAutoInjectorUserCSS, enableAutoInjectorUserCSS, getAutoInjectorUserCSS } from "./utils.mjs";
 
 async function main() {
     const user_css_div = document.getElementById("user-css-div") as HTMLDivElement;
@@ -13,13 +13,13 @@ async function createUserCssList() {
     list.className = "list-decimal list-outside p-1";
     list.id = "user-css-list";
     if (user_css !== undefined) {
-        for (const { name, url, css } of user_css) {
+        for (const { hash, name, url, css, enabled } of user_css) {
             const list_item = document.createElement("li");
             const div = document.createElement("div");
             div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
             const user_css_collapse_div = createUserCssCollapse(name, url, css);
-            const user_css_buttons_div = createUserCssButtons(css);
+            const user_css_buttons_div = createUserCssButtons(hash, css, enabled);
 
             div.appendChild(user_css_collapse_div);
             div.appendChild(user_css_buttons_div);
@@ -48,9 +48,19 @@ function createUserCssCollapse(name: string, url: string, css: string): HTMLDivE
     return user_css_collapse_div;
 }
 
-function createUserCssButtons(css: string): HTMLDivElement {
+function createUserCssButtons(hash: number, css: string, enabled: boolean): HTMLDivElement {
     const user_css_buttons_div = document.createElement("div");
     user_css_buttons_div.className = "flex place-items-center gap-4";
+
+    const checkbox_tooltip = document.createElement("div");
+    checkbox_tooltip.className = "tooltip";
+    checkbox_tooltip.setAttribute("data-tip", "Enable/disable this user css");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = enabled;
+    checkbox.className = "checkbox checkbox-primary my-auto";
+    checkbox.onclick = () => { toggleUserCssEnabled(hash, checkbox.checked) };
+    checkbox_tooltip.appendChild(checkbox);
 
     const copy_button_tooltip = document.createElement("div");
     copy_button_tooltip.className = "tooltip";
@@ -61,6 +71,7 @@ function createUserCssButtons(css: string): HTMLDivElement {
     copy_button.onclick = () => { copyScriptToClipboard(copy_button_tooltip, copy_button, css) };
     copy_button_tooltip.appendChild(copy_button);
 
+    user_css_buttons_div.appendChild(checkbox_tooltip);
     user_css_buttons_div.appendChild(copy_button_tooltip);
 
     return user_css_buttons_div;
@@ -76,3 +87,17 @@ function copyScriptToClipboard(copy_button_tooltip: HTMLDivElement, copy_button:
     navigator.clipboard.writeText(code);
 }
 
+async function toggleUserCssEnabled(hash: number, enabled: boolean) {
+    if (enabled) {
+        await enableAutoInjectorUserCSS(hash);
+    } else {
+        await disableAutoInjectorUserCSS(hash);
+    }
+    reload();
+}
+
+function reload() {
+    const user_css_div = document.getElementById("user-css-div") as HTMLDivElement;
+    user_css_div.children.item(0)?.remove();
+    createUserCssList().then((l) => user_css_div.appendChild(l))
+}

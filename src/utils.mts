@@ -157,6 +157,18 @@ export async function enableAutoInjectorScript(hash: number) {
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
+export async function enableAutoInjectorUserCSS(hash: number) {
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: Script[] | undefined };
+    if (user_css === undefined) {
+        user_css = [];
+    }
+    const i = user_css.findIndex((s) => s.hash === hash);
+    if (i === -1) return;
+
+    user_css[i].enabled = true;
+    await chrome.storage.local.set({ "user_css": user_css });
+}
+
 export async function disableAutoInjectorScript(hash: number) {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
@@ -167,6 +179,19 @@ export async function disableAutoInjectorScript(hash: number) {
 
     scripts[i].enabled = false;
     await chrome.storage.local.set({ "scripts": scripts });
+}
+
+export async function disableAutoInjectorUserCSS(hash: number) {
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: Script[] | undefined };
+    if (user_css === undefined) {
+        user_css = [];
+    }
+    const i = user_css.findIndex((s) => s.hash === hash);
+    if (i === -1) return;
+
+    user_css[i].enabled = false;
+    await chrome.storage.local.set({ "user_css": user_css });
+
 }
 
 export async function enableImmediatInjectionForAutoInjectorScript(hash: number) {
