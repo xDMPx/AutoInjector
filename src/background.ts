@@ -1,5 +1,5 @@
 import { AutoInjectorMessage, AutoInjectorMessageType, AutoInjectorOptions } from "./interfaces.mjs";
-import { canScriptRun, djb2Hash, getAutoInjectorOptions, getAutoInjectorScripts, saveAutoInjectorScript, saveAutoInjectorScriptError, setAutoInjectorOptions } from "./utils.mjs";
+import { canScriptRun, canUserCSSRun, djb2Hash, getAutoInjectorOptions, getAutoInjectorScripts, getAutoInjectorUserCSS, saveAutoInjectorScript, saveAutoInjectorScriptError, saveAutoInjectorUserCSS, setAutoInjectorOptions } from "./utils.mjs";
 
 chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledDetails) => {
     if (details.reason === "install") {
@@ -80,7 +80,6 @@ async function migrateFrom023To024() {
     }
 }
 
-
 async function migrateFrom024To025() {
     const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: { hash: number, name: string, url: string, code: string, enabled: boolean, injectImmediately: boolean }[] | undefined };
     if (scripts === undefined) return;
@@ -135,12 +134,14 @@ chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {
 chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedInfo) => {
     const tab = await chrome.tabs.get(activeInfo.tabId);
     injectUserScripts(tab);
+    injectUserCSS(tab);
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.OnUpdatedInfo) => {
     if (updateinfo.status === chrome.tabs.TabStatus.COMPLETE) {
         const tab = await chrome.tabs.get(tabId);
         injectUserScripts(tab);
+        injectUserCSS(tab);
     }
 });
 
@@ -186,6 +187,20 @@ async function injectUserScripts(tab: chrome.tabs.Tab) {
             injectImmediately: injectImmediately,
             world: "MAIN",
             func: injectScript,
+        });
+    }
+}
+
+async function injectUserCSS(tab: chrome.tabs.Tab) {
+    const user_css = await getAutoInjectorUserCSS();
+    if (user_css === undefined) return;
+    let tab_url = tab.url || tab.pendingUrl;
+    if (tab_url === undefined) return;
+    if (!tab_url.startsWith("http")) return;
+    for (const css of user_css.filter((s) => canUserCSSRun(s, tab_url)).map((s) => { return s.css })) {
+        await chrome.scripting.insertCSS({
+            target: { tabId: tab.id! },
+            css: css
         });
     }
 }

@@ -1,4 +1,4 @@
-import { Script, AutoInjectorOptions, ScriptError, AutoInjectorMessage, AutoInjectorMessageType } from "./interfaces.mjs";
+import { Script, AutoInjectorOptions, ScriptError, AutoInjectorMessage, AutoInjectorMessageType, CascadingStyleSheets } from "./interfaces.mjs";
 
 // http://www.cse.yorku.ca/~oz/hash.html
 export function djb2Hash(str: string): number {
@@ -34,9 +34,37 @@ export function canScriptRun(script: Script, tab_url: string): boolean {
     return true;
 }
 
+export function canUserCSSRun(css: CascadingStyleSheets, tab_url: string): boolean {
+    if (!css.enabled) return false;
+
+    let url = css.url;
+    const index_of_asterisk = url.indexOf("*");
+
+    if (!url.startsWith("https://") && !url.startsWith("http://")) {
+        tab_url = tab_url.replace("https://", "").replace("http://", "")
+    }
+
+    if (url.endsWith("/")) {
+        url = url.slice(0, url.length - 1);
+    }
+    if (tab_url.endsWith("/")) {
+        tab_url = tab_url.slice(0, tab_url.length - 1);
+    }
+
+    if (index_of_asterisk !== 0 && !(index_of_asterisk === -1 && tab_url === url)
+        && !(index_of_asterisk > 0 && tab_url.startsWith(url.slice(0, index_of_asterisk)))) return false;
+
+    return true;
+}
+
 export async function getAutoInjectorScripts(): Promise<Script[] | undefined> {
     const { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     return scripts;
+}
+
+export async function getAutoInjectorUserCSS(): Promise<CascadingStyleSheets[] | undefined> {
+    const { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: CascadingStyleSheets[] | undefined };
+    return user_css;
 }
 
 export async function saveAutoInjectorScript(name: string, url: string, script: string, injectImmediately: boolean, enabled: boolean = true): Promise<boolean> {
@@ -56,6 +84,25 @@ export async function saveAutoInjectorScript(name: string, url: string, script: 
         injectImmediately: injectImmediately
     });
     await chrome.storage.local.set({ "scripts": scripts });
+
+    return true;
+}
+
+export async function saveAutoInjectorUserCSS(name: string, url: string, css: string, enabled: boolean = true): Promise<boolean> {
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: CascadingStyleSheets[] | undefined };
+    if (user_css === undefined) {
+        user_css = [];
+    }
+    if (user_css.find((s) => s.name === name) !== undefined) return false;
+
+    user_css.push({
+        hash: djb2Hash(name + css),
+        name: name,
+        url: url,
+        css: css,
+        enabled: enabled,
+    });
+    await chrome.storage.local.set({ "user_css": user_css });
 
     return true;
 }

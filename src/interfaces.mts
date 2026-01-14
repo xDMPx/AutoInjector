@@ -8,6 +8,14 @@ export interface Script {
     injectImmediately: boolean
 }
 
+export interface CascadingStyleSheets {
+    hash: number,
+    name: string,
+    url: string,
+    css: string,
+    enabled: boolean,
+}
+
 export enum AutoInjectorMessageType {
     ErrorUpdate,
     ScriptError,
