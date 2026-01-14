@@ -7,6 +7,10 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
         if (scripts === undefined) {
             saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false, false);
         }
+        let user_css = await getAutoInjectorUserCSS();
+        if (user_css === undefined) {
+            saveAutoInjectorUserCSS("AutoInjector Test User CSS", "*", 'body { border: 20px dotted red; }', false);
+        }
         let ai_options = await getAutoInjectorOptions();
         setAutoInjectorOptions(ai_options);
     }
@@ -21,6 +25,10 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
             saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false, false);
+        }
+        let user_css = await getAutoInjectorUserCSS();
+        if (user_css === undefined) {
+            saveAutoInjectorUserCSS("AutoInjector Test User CSS", "*", 'body { border: 20px dotted red; }', false);
         }
     }
 });
