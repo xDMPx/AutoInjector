@@ -24,7 +24,8 @@
         "cp ./src/fonts/FiraCodeNerdFont/FiraCodeNerdFont-Regular.ttf ./dist/fonts/FiraCodeNerdFont-Regular.ttf",
         "cp ./manifest.json ./dist/manifest.json",
         "cp ./src/dashboard.html ./dist/dashboard.html",
-        "cp ./src/options.html ./dist/options.html"
+        "cp ./src/options.html ./dist/options.html",
+        "cp ./assets/* ./dist/"
       ],
       "update": [
         "npm update"

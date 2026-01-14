@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 8.4666662 8.4666666"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="icon_64.png"
+   inkscape:export-xdpi="192"
+   inkscape:export-ydpi="192"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     inkscape:zoom="13.654994"
+     inkscape:cx="12.74259"
+     inkscape:cy="23.581116"
+     inkscape:window-width="1251"
+     inkscape:window-height="1361"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#6272a4;fill-opacity:1;stroke:none;stroke-width:0.260689;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none"
+       id="rect7"
+       width="8.4666662"
+       height="8.4666662"
+       x="2.2252401e-07"
+       y="2.2252401e-07" />
+    <g
+       id="g5"
+       transform="rotate(45,2.8349239,3.6540934)">
+      <path
+         id="rect1"
+         style="fill:#6272a4;fill-opacity:1;stroke:#ffffff;stroke-width:0.264583;stroke-linecap:round"
+         d="M 3.175,2.1166668 H 5.2916665 V 5.8208334 L 4.2333332,6.9059065 3.175,5.8208334 Z"
+         sodipodi:nodetypes="cccccc" />
+      <rect
+         style="fill:#6272a4;fill-opacity:1;stroke:#f8f8f2;stroke-width:0.264583;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+         id="rect1-1"
+         width="1.0583333"
+         height="1.0583333"
+         x="3.7041667"
+         y="0.66877168" />
+      <rect
+         style="fill:#6272a4;fill-opacity:1;stroke:#f8f8f2;stroke-width:0.264583;stroke-linecap:round;stroke-opacity:1"
+         id="rect2"
+         width="4.2333331"
+         height="0.52916664"
+         x="2.1166668"
+         y="1.5847557" />
+      <rect
+         style="fill:#6272a4;fill-opacity:1;stroke:#f8f8f2;stroke-width:0.264583;stroke-linecap:round;stroke-opacity:1"
+         id="rect2-3"
+         width="3.175"
+         height="0.52916664"
+         x="2.6458333"
+         y="0.1322915" />
+      <rect
+         style="fill:#f8f8f2;fill-opacity:1;stroke:#f8f8f2;stroke-width:0.235188;stroke-linecap:square;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+         id="rect4"
+         width="1.8814802"
+         height="0.029398669"
+         x="3.2925932"
+         y="5.6738434" />
+      <rect
+         style="fill:#f8f8f2;fill-opacity:1;stroke:#f8f8f2;stroke-width:0.212829;stroke-linecap:square;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+         id="rect5"
+         width="0.05175323"
+         height="0.87524617"
+         x="4.2074566"
+         y="6.8619604" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;font-family:'CaskaydiaCove Nerd Font Mono';-inkscape-font-specification:'CaskaydiaCove Nerd Font Mono';writing-mode:lr-tb;direction:ltr;fill:#f8f8f2;stroke:#f8f8f2;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;fill-opacity:1;stroke-opacity:1"
+       x="0.043407898"
+       y="1.6205751"
+       id="text5"><tspan
+         sodipodi:role="line"
+         id="tspan5"
+         style="font-size:2.11667px;stroke-width:0.264583;stroke-linejoin:round;fill:#f8f8f2;fill-opacity:1;stroke:#f8f8f2;stroke-opacity:1"
+         x="0.043407898"
+         y="1.6205751">JS</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:2.11667px;font-family:'CaskaydiaCove Nerd Font Mono';-inkscape-font-specification:'CaskaydiaCove Nerd Font Mono';writing-mode:lr-tb;direction:ltr;fill:#f8f8f2;stroke:#f8f8f2;stroke-width:0.264583;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;fill-opacity:1;stroke-opacity:1"
+       x="4.7573271"
+       y="8.3137045"
+       id="text6"><tspan
+         sodipodi:role="line"
+         id="tspan6"
+         style="stroke-width:0.264583;stroke-linejoin:round;fill:#f8f8f2;fill-opacity:1;stroke:#f8f8f2;stroke-opacity:1"
+         x="4.7573271"
+         y="8.3137045">CSS</tspan></text>
+  </g>
+</svg>
