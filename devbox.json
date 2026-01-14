@@ -25,6 +25,7 @@
         "cp ./manifest.json ./dist/manifest.json",
         "cp ./src/dashboard.html ./dist/dashboard.html",
         "cp ./src/options.html ./dist/options.html",
+        "cp ./src/dashboard_css.html ./dist/dashboard_css.html",
         "cp ./assets/* ./dist/"
       ],
       "update": [
