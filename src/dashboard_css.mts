@@ -1,4 +1,4 @@
-import { disableAutoInjectorUserCSS, enableAutoInjectorUserCSS, getAutoInjectorUserCSS } from "./utils.mjs";
+import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS } from "./utils.mjs";
 
 async function main() {
     const user_css_div = document.getElementById("user-css-div") as HTMLDivElement;
@@ -19,7 +19,7 @@ async function createUserCssList() {
             div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
             const user_css_collapse_div = createUserCssCollapse(name, url, css);
-            const user_css_buttons_div = createUserCssButtons(hash, css, enabled);
+            const user_css_buttons_div = createUserCssButtons(hash, name, css, enabled);
 
             div.appendChild(user_css_collapse_div);
             div.appendChild(user_css_buttons_div);
@@ -48,7 +48,7 @@ function createUserCssCollapse(name: string, url: string, css: string): HTMLDivE
     return user_css_collapse_div;
 }
 
-function createUserCssButtons(hash: number, css: string, enabled: boolean): HTMLDivElement {
+function createUserCssButtons(hash: number, name: string, css: string, enabled: boolean): HTMLDivElement {
     const user_css_buttons_div = document.createElement("div");
     user_css_buttons_div.className = "flex place-items-center gap-4";
 
@@ -71,10 +71,42 @@ function createUserCssButtons(hash: number, css: string, enabled: boolean): HTML
     copy_button.onclick = () => { copyScriptToClipboard(copy_button_tooltip, copy_button, css) };
     copy_button_tooltip.appendChild(copy_button);
 
+    const delete_button_tooltip = document.createElement("div");
+    delete_button_tooltip.className = "tooltip";
+    delete_button_tooltip.setAttribute("data-tip", "Permanently remove this user css");
+    const delete_button = document.createElement("button");
+    delete_button.className = "btn btn-accent m-auto ";
+    delete_button.innerHTML = "<span class=\"material-symbols-outlined\">delete_forever</span>";
+    delete_button.onclick = () => { deleteUserCss(hash, name) };
+    delete_button_tooltip.appendChild(delete_button);
+
     user_css_buttons_div.appendChild(checkbox_tooltip);
     user_css_buttons_div.appendChild(copy_button_tooltip);
+    user_css_buttons_div.appendChild(delete_button_tooltip);
 
     return user_css_buttons_div;
+}
+
+async function deleteUserCss(hash: number, name: string) {
+    const options = await getAutoInjectorOptions();
+    if (options.confirmation_dialog_remove) {
+        const delete_user_css_modal = document.getElementById("delete_user_css_modal")! as HTMLDialogElement;
+        delete_user_css_modal.showModal();
+        delete_user_css_modal.onsubmit = async (e) => {
+            e.preventDefault();
+            if (e.submitter?.id === "delete_user_css_modal-yes") {
+                await deleteAutoInjectorUserCSS(hash);
+
+                shortToast(`User CSS "${name}" removed successfully!`);
+                reload();
+            }
+            delete_user_css_modal.close();
+        };
+    } else {
+        await deleteAutoInjectorUserCSS(hash);
+        shortToast(`User CSS "${name}" removed successfully!`);
+        reload();
+    }
 }
 
 function copyScriptToClipboard(copy_button_tooltip: HTMLDivElement, copy_button: HTMLButtonElement, code: string) {
@@ -94,6 +126,17 @@ async function toggleUserCssEnabled(hash: number, enabled: boolean) {
         await disableAutoInjectorUserCSS(hash);
     }
     reload();
+}
+
+function shortToast(msg: string) {
+    const toast = document.getElementById("toast")!;
+    toast.style.display = "block";
+    const toast_msg = document.getElementById("toast-text")!;
+    toast_msg.innerText = msg;
+    setTimeout(() => {
+        const toast = document.getElementById("toast")!;
+        toast.style.display = "none";
+    }, 300);
 }
 
 function reload() {

@@ -121,6 +121,19 @@ export async function deleteAutoInjectorScript(hash: number) {
     await chrome.storage.local.set({ "scripts": scripts });
 }
 
+export async function deleteAutoInjectorUserCSS(hash: number) {
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: CascadingStyleSheets[] | undefined };
+    if (user_css === undefined) {
+        user_css = [];
+    }
+    const i = user_css.findIndex((s) => s.hash === hash);
+    if (i === -1) return;
+
+    user_css.splice(i, 1);
+
+    await chrome.storage.local.set({ "user_css": user_css });
+}
+
 export async function editAutoInjectorScript(hash: number, name: string, url: string, script: string, injectImmediately: boolean): Promise<boolean> {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {
@@ -158,7 +171,7 @@ export async function enableAutoInjectorScript(hash: number) {
 }
 
 export async function enableAutoInjectorUserCSS(hash: number) {
-    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: Script[] | undefined };
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: CascadingStyleSheets[] | undefined };
     if (user_css === undefined) {
         user_css = [];
     }
@@ -182,7 +195,7 @@ export async function disableAutoInjectorScript(hash: number) {
 }
 
 export async function disableAutoInjectorUserCSS(hash: number) {
-    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: Script[] | undefined };
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: CascadingStyleSheets[] | undefined };
     if (user_css === undefined) {
         user_css = [];
     }
