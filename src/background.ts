@@ -133,40 +133,14 @@ chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {
 });
 
 chrome.tabs.onActivated.addListener(async (activeInfo: chrome.tabs.OnActivatedInfo) => {
-    const scripts = await getAutoInjectorScripts();
-    if (scripts === undefined) return;
     const tab = await chrome.tabs.get(activeInfo.tabId);
-    let tab_url = tab.url || tab.pendingUrl;
-    if (tab_url === undefined) return;
-    if (!tab_url.startsWith("http")) return;
-    for (const { hash, code, injectImmediately } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code, injectImmediately: s.injectImmediately } })) {
-        await chrome.scripting.executeScript({
-            target: { tabId: activeInfo.tabId },
-            args: [code, hash, chrome.runtime.id],
-            injectImmediately: injectImmediately,
-            world: "MAIN",
-            func: injectScript,
-        });
-    }
+    injectUserScripts(tab);
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId: number, updateinfo: chrome.tabs.OnUpdatedInfo) => {
     if (updateinfo.status === chrome.tabs.TabStatus.COMPLETE) {
-        const scripts = await getAutoInjectorScripts();
-        if (scripts === undefined) return;
         const tab = await chrome.tabs.get(tabId);
-        let tab_url = tab.url || tab.pendingUrl;
-        if (tab_url === undefined) return;
-        if (!tab_url.startsWith("http")) return;
-        for (const { hash, code, injectImmediately } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code, injectImmediately: s.injectImmediately } })) {
-            await chrome.scripting.executeScript({
-                target: { tabId: tabId },
-                args: [code, hash, chrome.runtime.id],
-                injectImmediately: injectImmediately,
-                world: "MAIN",
-                func: injectScript,
-            });
-        }
+        injectUserScripts(tab);
     }
 });
 
@@ -198,6 +172,23 @@ chrome.runtime.onMessageExternal.addListener(async (_msg) => {
         chrome.runtime.sendMessage(update_msg);
     }
 });
+
+async function injectUserScripts(tab: chrome.tabs.Tab) {
+    const scripts = await getAutoInjectorScripts();
+    if (scripts === undefined) return;
+    let tab_url = tab.url || tab.pendingUrl;
+    if (tab_url === undefined) return;
+    if (!tab_url.startsWith("http")) return;
+    for (const { hash, code, injectImmediately } of scripts.filter((s) => canScriptRun(s, tab_url)).map((s) => { return { hash: s.hash, code: s.code, injectImmediately: s.injectImmediately } })) {
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id! },
+            args: [code, hash, chrome.runtime.id],
+            injectImmediately: injectImmediately,
+            world: "MAIN",
+            func: injectScript,
+        });
+    }
+}
 
 function injectScript(code: string, hash: number, id: string) {
     const auto_injector_script = document.getElementById(`autoinjector-script-${hash}`);
