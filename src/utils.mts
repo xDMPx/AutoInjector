@@ -158,6 +158,25 @@ export async function editAutoInjectorScript(hash: number, name: string, url: st
     return true;
 }
 
+export async function editAutoInjectorUserCss(hash: number, name: string, url: string, css: string): Promise<boolean> {
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: CascadingStyleSheets[] | undefined };
+    if (user_css === undefined) {
+        user_css = [];
+    }
+    const i = user_css.findIndex((s) => s.hash === hash);
+    if (i === -1) return false;
+    if (user_css.find((s, j) => j !== i && s.name === name) !== undefined) return false;
+
+    user_css[i].hash = djb2Hash(name + css);
+    user_css[i].name = name;
+    user_css[i].url = url;
+    user_css[i].css = css;
+
+    await chrome.storage.local.set({ "user_css": user_css });
+
+    return true;
+}
+
 export async function enableAutoInjectorScript(hash: number) {
     let { scripts } = await chrome.storage.local.get("scripts") as { [key: string]: Script[] | undefined };
     if (scripts === undefined) {

@@ -1,5 +1,5 @@
 import { getLineIndent, shortToast } from "./dashboard_utils.mjs";
-import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
+import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, editAutoInjectorUserCss, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
 
 async function main() {
     const user_css_div = document.getElementById("user-css-div") as HTMLDivElement;
@@ -50,7 +50,7 @@ async function createUserCssList() {
             div.className = "inline-flex place-items-center w-full p-4 gap-4";
 
             const user_css_collapse_div = createUserCssCollapse(name, url, css);
-            const user_css_buttons_div = createUserCssButtons(hash, name, css, enabled);
+            const user_css_buttons_div = createUserCssButtons(hash, name, url, css, enabled);
 
             div.appendChild(user_css_collapse_div);
             div.appendChild(user_css_buttons_div);
@@ -79,7 +79,7 @@ function createUserCssCollapse(name: string, url: string, css: string): HTMLDivE
     return user_css_collapse_div;
 }
 
-function createUserCssButtons(hash: number, name: string, css: string, enabled: boolean): HTMLDivElement {
+function createUserCssButtons(hash: number, name: string, url: string, css: string, enabled: boolean): HTMLDivElement {
     const user_css_buttons_div = document.createElement("div");
     user_css_buttons_div.className = "flex place-items-center gap-4";
 
@@ -92,6 +92,45 @@ function createUserCssButtons(hash: number, name: string, css: string, enabled: 
     checkbox.className = "checkbox checkbox-primary my-auto";
     checkbox.onclick = () => { toggleUserCssEnabled(hash, checkbox.checked) };
     checkbox_tooltip.appendChild(checkbox);
+
+    const edit_button_tooltip = document.createElement("div");
+    edit_button_tooltip.className = "tooltip";
+    edit_button_tooltip.setAttribute("data-tip", "Edit this user css");
+    const edit_button = document.createElement("button");
+    edit_button.className = "btn btn-accent m-auto edit-button";
+    edit_button.innerHTML = "<span class=\"material-symbols-outlined\">edit</span>";
+    edit_button.onclick = () => {
+        const user_css_list = document.getElementById("user-css-list")!;
+        for (const user_css of user_css_list?.children) {
+            const edit_button = user_css.getElementsByClassName("edit-button").item(0) as HTMLButtonElement | null;
+            if (edit_button == null) continue;
+            edit_button.disabled = true;
+        }
+        edit_button.disabled = false;
+
+        edit_button_tooltip.setAttribute("data-tip", "Cancel edit");
+        edit_button.innerHTML = "<span class=\"material-symbols-outlined\">cancel</span>";
+        edit_button.className = "btn btn-secondary m-auto";
+        checkbox.disabled = true;
+        editUserCssMode(hash, name, url, css);
+        edit_button.onclick = async () => {
+            const options = await getAutoInjectorOptions();
+            if (options.confirmation_dialog_edit_cancel) {
+                const exit_edit_user_css_modal = document.getElementById("exit_edit_user_css_modal")! as HTMLDialogElement;
+                exit_edit_user_css_modal.showModal();
+                exit_edit_user_css_modal.onsubmit = async (e) => {
+                    e.preventDefault();
+                    if (e.submitter?.id === "exit_edit_user_css_modal-yes") {
+                        reload();
+                    }
+                    exit_edit_user_css_modal.close();
+                };
+            } else {
+                reload();
+            }
+        };
+    };
+    edit_button_tooltip.appendChild(edit_button);
 
     const copy_button_tooltip = document.createElement("div");
     copy_button_tooltip.className = "tooltip";
@@ -112,6 +151,7 @@ function createUserCssButtons(hash: number, name: string, css: string, enabled: 
     delete_button_tooltip.appendChild(delete_button);
 
     user_css_buttons_div.appendChild(checkbox_tooltip);
+    user_css_buttons_div.appendChild(edit_button_tooltip);
     user_css_buttons_div.appendChild(copy_button_tooltip);
     user_css_buttons_div.appendChild(delete_button_tooltip);
 
@@ -165,6 +205,63 @@ async function deleteUserCss(hash: number, name: string) {
         await deleteAutoInjectorUserCSS(hash);
         shortToast(`User CSS "${name}" removed successfully!`);
         reload();
+    }
+}
+
+function editUserCssMode(hash: number, name: string, url: string, css: string) {
+    const user_css_name = document.getElementById("user-css-name") as HTMLTextAreaElement;
+    const user_css_url = document.getElementById("user-css-url") as HTMLTextAreaElement;
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    const submit_user_css_button = document.getElementById("submit-user-css") as HTMLButtonElement;
+    const submit_user_css_form = document.getElementById("submit-user-css-form") as HTMLFormElement;
+    user_css_text.style.height = 'auto';
+    submit_user_css_button.textContent = "Save";
+    submit_user_css_form.onsubmit = (e) => { editUserCss(e, hash) };
+    user_css_text.value = css;
+    user_css_text.style.height = `${user_css_text.scrollHeight}px`;
+    user_css_name.value = name;
+    user_css_url.value = url;
+}
+
+async function editUserCss(e: SubmitEvent, hash: number) {
+    e.preventDefault();
+    const editUserCss = async () => {
+        const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+        const user_css_name = document.getElementById("user-css-name") as HTMLInputElement;
+        const user_css_url = document.getElementById("user-css-url") as HTMLTextAreaElement;
+        const name = user_css_name.value;
+
+        const edited = await editAutoInjectorUserCss(hash, user_css_name.value, user_css_url.value, user_css_text.value);
+        if (edited) {
+            shortToast(`User CSS "${name}" updated successfully!`);
+            reload();
+        } else {
+            user_css_name.pattern = `^(?!${user_css_name.value}$).*$`;
+            (user_css_name.nextElementSibling! as HTMLDivElement).innerText = "User CSS name must be unique";
+            user_css_name.oninput = () => {
+                if (user_css_name.value.length > 2) {
+                    (user_css_name.nextElementSibling! as HTMLDivElement).innerText = "User CSS name must be unique";
+                } else {
+                    (user_css_name.nextElementSibling! as HTMLDivElement).innerText = "";
+                }
+            }
+            user_css_name.reportValidity();
+        }
+    };
+
+    const options = await getAutoInjectorOptions();
+    if (options.confirmation_dialog_edit) {
+        const edit_user_css_modal = document.getElementById("edit_user_css_modal")! as HTMLDialogElement;
+        edit_user_css_modal.showModal();
+        edit_user_css_modal.onsubmit = async (e) => {
+            e.preventDefault();
+            if (e.submitter?.id === "edit_user_css_modal-yes") {
+                await editUserCss();
+            }
+            edit_user_css_modal.close();
+        };
+    } else {
+        await editUserCss();
     }
 }
 
@@ -274,6 +371,9 @@ function reload() {
     const submit_css_form = document.getElementById("submit-user-css-form") as HTMLFormElement;
     submit_css_form.reset();
     submit_css_form.onsubmit = (e) => { saveUserCss(e); };
+
+    const submit_user_css_button = document.getElementById("submit-user-css") as HTMLButtonElement;
+    submit_user_css_button.textContent = "Submit";
 
     const user_css_div = document.getElementById("user-css-div") as HTMLDivElement;
     user_css_div.children.item(0)?.remove();

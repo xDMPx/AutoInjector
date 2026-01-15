@@ -45,6 +45,50 @@
     </div>
 </body>
 
+<dialog id="edit_user_css_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="modal-box-h3">
+            Are you sure you want to edit this user CSS? <br>
+            This action cannot be undone.
+        </h3>
+        <form>
+            <div class="modal-confirmation-form">
+                <div class="form-control">
+                    <button id="edit_user_css_modal-yes" class="btn btn-primary">Yes</button>
+                </div>
+                <form method="dialog">
+                    <button id="edit_user_css_modal-no" class="btn btn-neutral">No</button>
+                </form>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<dialog id="exit_edit_user_css_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="modal-box-h3">
+            Are you sure you want to exit user CSS edit mode?<br>
+            All unsaved changes will be lost.
+        </h3>
+        <form>
+            <div class="modal-confirmation-form">
+                <div class="form-control">
+                    <button id="exit_edit_user_css_modal-yes" class="btn btn-primary">Yes</button>
+                </div>
+                <form method="dialog">
+                    <button id="exit_edit_user_css_modal-no" class="btn btn-neutral">No</button>
+                </form>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
 <dialog id="delete_user_css_modal" class="modal">
     <div class="modal-box">
         <h3 class="modal-box-h3">
