@@ -1,4 +1,4 @@
-import { getLineIndent, shortToast } from "./dashboard_utils.mjs";
+import { autoIndentOnEnter, autoResizeTextArea, getLineIndent, shortToast } from "./dashboard_utils.mjs";
 import { AutoInjectorMessage, AutoInjectorMessageType, Script, ScriptError } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
@@ -30,13 +30,13 @@ async function main() {
         getAutoInjectorOptions().then((o) => options = o);
     };
     user_script_text.oninput = () => {
-        autoResizeTextArea()
+        autoResizeTextArea("user-script");
         getAutoInjectorOptions().then((o) => options = o);
     };
     user_script_text.onkeydown = (e) => {
         getAutoInjectorOptions().then((o) => options = o);
         if (e.key === "Escape") overwrite_tab_behaviour = false;
-        autoIndentOnEnter(e);
+        autoIndentOnEnter("user-script", e);
         if (overwrite_tab_behaviour) {
             if (options.enable_remove_indent_shift_tab) {
                 removeLastIndentOnShiftTabKey(e);
@@ -46,7 +46,7 @@ async function main() {
             }
         }
     };
-    autoResizeTextArea();
+    autoResizeTextArea("user-script");
     if (!options.enable_setting_inject_immediately) {
         document.getElementById("user-script-inject-immediately-label")!.style.display = "none";
     }
@@ -525,32 +525,6 @@ async function createInjectionErrorList() {
     return list;
 }
 
-
-function autoResizeTextArea() {
-    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-    // recalculate the scrollHeight 
-    user_script_text.style.height = 'auto';
-    user_script_text.style.height = `${user_script_text.scrollHeight}px`;
-}
-
-function autoIndentOnEnter(e: KeyboardEvent) {
-    if (e.key !== "Enter") return;
-    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-    if (user_script_text.selectionStart !== user_script_text.selectionEnd) return;
-
-    e.preventDefault();
-    const cursor_pos = user_script_text.selectionStart;
-    const before = user_script_text.value.slice(0, cursor_pos);
-    const after = user_script_text.value.slice(cursor_pos);
-
-    const prev_line = before.slice(before.lastIndexOf("\n") + 1);
-    const indent = getLineIndent(prev_line);
-
-    user_script_text.value = `${before}\n${indent}${after}`;
-    user_script_text.selectionStart = before.length + indent.length + 1;
-    user_script_text.selectionEnd = before.length + indent.length + 1;
-}
-
 function insertTabOnTabKey(e: KeyboardEvent) {
     if (e.key !== "Tab" || e.shiftKey === true) return;
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
@@ -913,7 +887,7 @@ function reload() {
     user_script_name.value = "";
     user_script_url.value = "*";
     user_script_inject_immediately.checked = false;
-    autoResizeTextArea();
+    autoResizeTextArea("user-script");
 
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     submit_script_form.reset();

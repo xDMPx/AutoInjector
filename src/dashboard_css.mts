@@ -1,4 +1,4 @@
-import { getLineIndent, shortToast } from "./dashboard_utils.mjs";
+import { autoIndentOnEnter, autoResizeTextArea, getLineIndent, shortToast } from "./dashboard_utils.mjs";
 import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, editAutoInjectorUserCss, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
 
 async function main() {
@@ -17,13 +17,13 @@ async function main() {
         getAutoInjectorOptions().then((o) => options = o);
     };
     user_css_text.oninput = () => {
-        autoResizeTextArea();
+        autoResizeTextArea("user-css");
         getAutoInjectorOptions().then((o) => options = o);
     };
     user_css_text.onkeydown = (e) => {
         getAutoInjectorOptions().then((o) => options = o);
         if (e.key === "Escape") overwrite_tab_behaviour = false;
-        autoIndentOnEnter(e);
+        autoIndentOnEnter("user-css", e);
         if (overwrite_tab_behaviour) {
             if (options.enable_remove_indent_shift_tab) {
                 removeLastIndentOnShiftTabKey(e);
@@ -33,7 +33,7 @@ async function main() {
             }
         }
     };
-    autoResizeTextArea();
+    autoResizeTextArea("user-css");
 }
 
 main();
@@ -284,31 +284,6 @@ async function toggleUserCssEnabled(hash: number, enabled: boolean) {
     reload();
 }
 
-function autoResizeTextArea() {
-    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
-    // recalculate the scrollHeight 
-    user_css_text.style.height = 'auto';
-    user_css_text.style.height = `${user_css_text.scrollHeight}px`;
-}
-
-function autoIndentOnEnter(e: KeyboardEvent) {
-    if (e.key !== "Enter") return;
-    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
-    if (user_css_text.selectionStart !== user_css_text.selectionEnd) return;
-
-    e.preventDefault();
-    const cursor_pos = user_css_text.selectionStart;
-    const before = user_css_text.value.slice(0, cursor_pos);
-    const after = user_css_text.value.slice(cursor_pos);
-
-    const prev_line = before.slice(before.lastIndexOf("\n") + 1);
-    const indent = getLineIndent(prev_line);
-
-    user_css_text.value = `${before}\n${indent}${after}`;
-    user_css_text.selectionStart = before.length + indent.length + 1;
-    user_css_text.selectionEnd = before.length + indent.length + 1;
-}
-
 function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
     if (e.key !== "Tab" || e.shiftKey === false) return;
     const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
@@ -366,7 +341,7 @@ function reload() {
     user_css_text.value = "";
     user_css_name.value = "";
     user_css_url.value = "*";
-    autoResizeTextArea();
+    autoResizeTextArea("user-css");
 
     const submit_css_form = document.getElementById("submit-user-css-form") as HTMLFormElement;
     submit_css_form.reset();
