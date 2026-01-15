@@ -36,6 +36,8 @@ async function main() {
     autoResizeTextArea("user-css");
 
 
+    const btn_disable_all = document.getElementById("btn_disable_all")!;
+    btn_disable_all.onclick = onDisableAllClick;
 
     const options_button = document.getElementById("btn_options")!;
     options_button.onclick = () => {
@@ -301,6 +303,15 @@ async function toggleUserCssEnabled(hash: number, enabled: boolean) {
         await enableAutoInjectorUserCSS(hash);
     } else {
         await disableAutoInjectorUserCSS(hash);
+    }
+    reload();
+}
+
+async function onDisableAllClick() {
+    let user_css = await getAutoInjectorUserCSS();
+    if (user_css === undefined) return;
+    for (const u_css of user_css) {
+        await disableAutoInjectorUserCSS(u_css.hash);
     }
     reload();
 }
