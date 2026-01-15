@@ -1,3 +1,4 @@
+import { getLineIndent, shortToast } from "./dashboard_utils.mjs";
 import { AutoInjectorMessage, AutoInjectorMessageType, Script, ScriptError } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
@@ -600,14 +601,6 @@ function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
     user_script_text.selectionEnd = cursor_pos - symbols_removed;
 }
 
-function getLineIndent(line: string): string {
-    let i = 0;
-    while (i < line.length && (line[i] === ' ' || line[i] === '\t')) {
-        i++;
-    }
-    return line.slice(0, i);
-}
-
 async function saveScript(e: SubmitEvent) {
     e.preventDefault();
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
@@ -940,15 +933,4 @@ function reload() {
     const script_div = document.getElementById("script-div") as HTMLDivElement;
     script_div.children.item(0)?.remove();
     createScriptList().then((l) => script_div.appendChild(l))
-}
-
-function shortToast(msg: string) {
-    const toast = document.getElementById("toast")!;
-    toast.style.display = "block";
-    const toast_msg = document.getElementById("toast-text")!;
-    toast_msg.innerText = msg;
-    setTimeout(() => {
-        const toast = document.getElementById("toast")!;
-        toast.style.display = "none";
-    }, 300);
 }

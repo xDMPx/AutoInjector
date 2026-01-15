@@ -1,3 +1,4 @@
+import { getLineIndent, shortToast } from "./dashboard_utils.mjs";
 import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
 
 async function main() {
@@ -259,25 +260,6 @@ function insertTabOnTabKey(e: KeyboardEvent) {
 
     user_css_text.selectionStart = cursor_pos + 1;
     user_css_text.selectionEnd = cursor_pos + 1;
-}
-
-function getLineIndent(line: string): string {
-    let i = 0;
-    while (i < line.length && (line[i] === ' ' || line[i] === '\t')) {
-        i++;
-    }
-    return line.slice(0, i);
-}
-
-function shortToast(msg: string) {
-    const toast = document.getElementById("toast")!;
-    toast.style.display = "block";
-    const toast_msg = document.getElementById("toast-text")!;
-    toast_msg.innerText = msg;
-    setTimeout(() => {
-        const toast = document.getElementById("toast")!;
-        toast.style.display = "none";
-    }, 300);
 }
 
 function reload() {
