@@ -38,6 +38,34 @@
         <div id="user-css-div"></div>
     </div>
 
+
+    <div class="menu-fab">
+        <div class="tooltip tooltip-left" data-tip="Action menu">
+            <div tabindex="0" role="button" class="menu-speed-dial-btn">
+                <span class="material-symbols-outlined">
+                    menu
+                </span>
+            </div>
+        </div>
+
+        <div class="tooltip tooltip-left" data-tip="Options">
+            <button id="btn_options" class="menu-speed-dial-btn">
+                <span class="material-symbols-outlined">
+                    settings
+                </span>
+            </button>
+        </div>
+        <div class="tooltip tooltip-left" data-tip="About">
+            <button id="btn_about" class="menu-speed-dial-btn">
+                <span class="material-symbols-outlined">
+                    info
+                </span>
+            </button>
+        </div>
+
+    </div>
+
+
     <div id="toast" class="hidden toast toast-start">
         <div class="alert alert-info">
             <span id="toast-text"></span>
@@ -105,6 +133,76 @@
                 </form>
             </div>
         </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<dialog id="about_modal" class="modal">
+    <div class="modal-box">
+        <h2 class="text-lg font-bold">About</h2>
+        <div>
+            <div class="mx-auto p-4">
+                <h3 id="about-name_text" class="text-lg text-center"></h3>
+                <p id="about-description_text" class="text-center"></p>
+            </div>
+            <div class="grid gap-4">
+                <div class="flex place-items-center">
+                    <span class="material-symbols-outlined px-4">
+                        info
+                    </span>
+                    <span id="about-version_text"></span>
+                </div>
+                <a href="https://github.com/xDMPx/AutoInjector" class="flex place-items-center">
+                    <span class="material-symbols-outlined px-4">
+                        code
+                    </span>
+                    <span>
+                        Source code
+                    </span>
+                </a>
+                <a href="https://github.com/xDMPx/AutoInjector/blob/main/LICENSE" class="flex place-items-center">
+                    <span class="material-symbols-outlined px-4">
+                        license
+                    </span>
+                    <span>
+                        License: MIT
+                    </span>
+                </a>
+                <a href="https://github.com/xDMPx" class="flex place-items-center">
+                    <span class="material-symbols-outlined px-4">
+                        account_circle
+                    </span>
+                    <span>
+                        Author: xDMPx
+                    </span>
+                </a>
+            </div>
+            <div class="divider"></div>
+            <h2 class="text-lg font-bold pb-4">Licenses</h2>
+            <div class="grid gap-4">
+                <div class="text-sm">
+                    <a href="https://github.com/google/material-design-icons">Material Symbols Outlined</a>
+                    <span>by Google,</span>
+                    <a href="https://github.com/google/material-design-icons/blob/master/LICENSE">
+                        Apache License 2.0
+                    </a>
+                </div>
+                <div class="text-sm">
+                    <a href="https://github.com/ryanoasis/nerd-fonts/tree/master/patched-fonts/FiraCode">
+                        FiraCode Nerd Font
+                    </a>
+                    <span>by The Fira Code Project Authors,</span>
+                    <a href="https://github.com/tonsky/FiraCode/blob/master/LICENSE">SIL Open Font License 1.1</a>
+                </div>
+            </div>
+        </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn">Close</button>
+            </form>
+        </div>
     </div>
     <form method="dialog" class="modal-backdrop">
         <button>close</button>

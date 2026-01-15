@@ -34,6 +34,27 @@ async function main() {
         }
     };
     autoResizeTextArea("user-css");
+
+
+
+    const options_button = document.getElementById("btn_options")!;
+    options_button.onclick = () => {
+        chrome.runtime.openOptionsPage();
+    }
+
+    const about_button = document.getElementById("btn_about")!;
+    about_button.onclick = () => {
+        const about_modal = document.getElementById("about_modal")! as HTMLDialogElement;
+        about_modal.showModal();
+    };
+
+    const about_name_text = document.getElementById("about-name_text")!;
+    about_name_text.innerText = `${chrome.runtime.getManifest().name}`;
+    const about_description_text = document.getElementById("about-description_text")!;
+    about_description_text.innerText = `${chrome.runtime.getManifest().description}`;
+    const about_version_text = document.getElementById("about-version_text")!;
+    about_version_text.innerText = `Version v${chrome.runtime.getManifest().version}`;
+
 }
 
 main();
