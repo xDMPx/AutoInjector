@@ -15,6 +15,22 @@
 
 <body>
     <div class="w-2/4 mx-auto">
+        <form id="submit-user-css-form" class="grid p-3 gap-2">
+            <label class="script-form-input validator ">
+                <span class="label">Name</span>
+                <input class="validator" id="user-css-name" type="text" required placeholder="User CSS name"
+                    minlength="3" />
+                <div class="validator-hint"></div>
+            </label>
+            <label class="script-form-input validator">
+                <span class="label whitespace-pre pr-6">URL</span>
+                <input id="user-css-url" type="text" required class="validator" placeholder="URL" value="*"
+                    pattern="^[^*]*\*?$" />
+                <div class="validator-hint">Only one wildcard allowed at the end</div>
+            </label>
+            <textarea required class="outline p-4" id="user-css" spellcheck="false" placeholder="CSS"></textarea>
+            <button class="btn btn-primary" id="submit-user-css">Submit</button>
+        </form>
         <div id="user-css-div"></div>
     </div>
 

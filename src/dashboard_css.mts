@@ -1,8 +1,38 @@
-import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS } from "./utils.mjs";
+import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
 
 async function main() {
     const user_css_div = document.getElementById("user-css-div") as HTMLDivElement;
     user_css_div.appendChild(await createUserCssList());
+
+
+    const submit_user_css = document.getElementById("submit-user-css-form") as HTMLFormElement;
+    submit_user_css.onsubmit = (e) => { saveUserCss(e); };
+
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    let overwrite_tab_behaviour = false;
+    let options = await getAutoInjectorOptions();
+    user_css_text.onfocus = () => {
+        overwrite_tab_behaviour = true;
+        getAutoInjectorOptions().then((o) => options = o);
+    };
+    user_css_text.oninput = () => {
+        autoResizeTextArea();
+        getAutoInjectorOptions().then((o) => options = o);
+    };
+    user_css_text.onkeydown = (e) => {
+        getAutoInjectorOptions().then((o) => options = o);
+        if (e.key === "Escape") overwrite_tab_behaviour = false;
+        autoIndentOnEnter(e);
+        if (overwrite_tab_behaviour) {
+            if (options.enable_remove_indent_shift_tab) {
+                removeLastIndentOnShiftTabKey(e);
+            }
+            if (options.enable_insert_tab_on_tab) {
+                insertTabOnTabKey(e);
+            }
+        }
+    };
+    autoResizeTextArea();
 }
 
 main();
@@ -87,6 +117,34 @@ function createUserCssButtons(hash: number, name: string, css: string, enabled: 
     return user_css_buttons_div;
 }
 
+async function saveUserCss(e: SubmitEvent) {
+    e.preventDefault();
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    const user_css_name = document.getElementById("user-css-name") as HTMLInputElement;
+    const user_css_url = document.getElementById("user-css-url") as HTMLTextAreaElement;
+
+    const saveUserCss = async () => {
+        const saved = await saveAutoInjectorUserCSS(user_css_name.value, user_css_url.value, user_css_text.value);
+        if (saved) {
+            shortToast(`User CSS "${user_css_name.value}" saved successfully!"`);
+            reload();
+        } else {
+            user_css_name.pattern = `^(?!${user_css_name.value}$).*$`;
+            (user_css_name.nextElementSibling! as HTMLDivElement).innerText = "User CSS name must be unique";
+            user_css_name.oninput = () => {
+                if (user_css_name.value.length > 2) {
+                    (user_css_name.nextElementSibling! as HTMLDivElement).innerText = "User CSS name must be unique";
+                } else {
+                    (user_css_name.nextElementSibling! as HTMLDivElement).innerText = "";
+                }
+            }
+            user_css_name.reportValidity();
+        }
+    };
+
+    saveUserCss();
+}
+
 async function deleteUserCss(hash: number, name: string) {
     const options = await getAutoInjectorOptions();
     if (options.confirmation_dialog_remove) {
@@ -128,6 +186,89 @@ async function toggleUserCssEnabled(hash: number, enabled: boolean) {
     reload();
 }
 
+function autoResizeTextArea() {
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    // recalculate the scrollHeight 
+    user_css_text.style.height = 'auto';
+    user_css_text.style.height = `${user_css_text.scrollHeight}px`;
+}
+
+function autoIndentOnEnter(e: KeyboardEvent) {
+    if (e.key !== "Enter") return;
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    if (user_css_text.selectionStart !== user_css_text.selectionEnd) return;
+
+    e.preventDefault();
+    const cursor_pos = user_css_text.selectionStart;
+    const before = user_css_text.value.slice(0, cursor_pos);
+    const after = user_css_text.value.slice(cursor_pos);
+
+    const prev_line = before.slice(before.lastIndexOf("\n") + 1);
+    const indent = getLineIndent(prev_line);
+
+    user_css_text.value = `${before}\n${indent}${after}`;
+    user_css_text.selectionStart = before.length + indent.length + 1;
+    user_css_text.selectionEnd = before.length + indent.length + 1;
+}
+
+function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
+    if (e.key !== "Tab" || e.shiftKey === false) return;
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    if (user_css_text.selectionStart !== user_css_text.selectionEnd) return;
+    e.preventDefault();
+
+    const cursor_pos = user_css_text.selectionStart;
+    let before = user_css_text.value.slice(0, cursor_pos);
+    const after = user_css_text.value.slice(cursor_pos);
+
+    let line = before.slice(before.lastIndexOf("\n") + 1);
+    let indent = getLineIndent(line);
+    before = before.slice(0, before.length - line.length);
+    line = line.slice(indent.length);
+    let symbols_removed = 0;
+    if (indent.endsWith("\t")) {
+        indent = indent.slice(0, indent.length - 1);
+        symbols_removed = 1;
+    } else if (indent.endsWith(" ")) {
+        let count_of_spaces = 0;
+        for (let i = indent.length - 1; i >= 0 && indent[i] === " "; i--) {
+            count_of_spaces++;
+        }
+        console.log(count_of_spaces);
+        const remove = (count_of_spaces % 4 === 0) ? 4 : count_of_spaces % 4;
+        indent = indent.slice(0, indent.length - remove);
+        symbols_removed = remove;
+    }
+
+    user_css_text.value = `${before}${indent}${line}${after}`;
+    user_css_text.selectionStart = cursor_pos - symbols_removed;
+    user_css_text.selectionEnd = cursor_pos - symbols_removed;
+}
+
+function insertTabOnTabKey(e: KeyboardEvent) {
+    if (e.key !== "Tab" || e.shiftKey === true) return;
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    if (user_css_text.selectionStart !== user_css_text.selectionEnd) return;
+    e.preventDefault();
+
+    const cursor_pos = user_css_text.selectionStart;
+    const before = user_css_text.value.slice(0, cursor_pos);
+    const after = user_css_text.value.slice(cursor_pos);
+
+    user_css_text.value = `${before}\t${after}`;
+
+    user_css_text.selectionStart = cursor_pos + 1;
+    user_css_text.selectionEnd = cursor_pos + 1;
+}
+
+function getLineIndent(line: string): string {
+    let i = 0;
+    while (i < line.length && (line[i] === ' ' || line[i] === '\t')) {
+        i++;
+    }
+    return line.slice(0, i);
+}
+
 function shortToast(msg: string) {
     const toast = document.getElementById("toast")!;
     toast.style.display = "block";
@@ -140,6 +281,18 @@ function shortToast(msg: string) {
 }
 
 function reload() {
+    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+    const user_css_name = document.getElementById("user-css-name") as HTMLInputElement;
+    const user_css_url = document.getElementById("user-css-url") as HTMLTextAreaElement;
+    user_css_text.value = "";
+    user_css_name.value = "";
+    user_css_url.value = "*";
+    autoResizeTextArea();
+
+    const submit_css_form = document.getElementById("submit-user-css-form") as HTMLFormElement;
+    submit_css_form.reset();
+    submit_css_form.onsubmit = (e) => { saveUserCss(e); };
+
     const user_css_div = document.getElementById("user-css-div") as HTMLDivElement;
     user_css_div.children.item(0)?.remove();
     createUserCssList().then((l) => user_css_div.appendChild(l))
