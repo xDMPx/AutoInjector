@@ -1,3 +1,13 @@
+export function copyContentToClipboard(copy_button_tooltip: HTMLDivElement, copy_button: HTMLButtonElement, content: string) {
+    copy_button_tooltip.setAttribute("data-tip", "Copied!");
+    copy_button.innerHTML = "<span class=\"material-symbols-outlined\">check</span>";
+    setTimeout(() => {
+        copy_button_tooltip.setAttribute("data-tip", "Copy to clipboard");
+        copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
+    }, 250);
+    navigator.clipboard.writeText(content);
+}
+
 export function autoResizeTextArea(id: string) {
     const text_area = document.getElementById(id) as HTMLTextAreaElement;
     // recalculate the scrollHeight 

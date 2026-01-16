@@ -1,4 +1,4 @@
-import { autoIndentOnEnter, autoResizeTextArea, getLineIndent, shortToast } from "./dashboard_utils.mjs";
+import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, getLineIndent, shortToast } from "./dashboard_utils.mjs";
 import { AutoInjectorMessage, AutoInjectorMessageType, Script, ScriptError } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
@@ -266,7 +266,7 @@ function createScriptButtons(hash: number, name: string, url: string, code: stri
     const copy_button = document.createElement("button");
     copy_button.className = "btn btn-accent m-auto";
     copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
-    copy_button.onclick = () => { copyScriptToClipboard(copy_button_tooltip, copy_button, code) };
+    copy_button.onclick = () => { copyContentToClipboard(copy_button_tooltip, copy_button, code) };
     copy_button_tooltip.appendChild(copy_button);
 
     const delete_button_tooltip = document.createElement("div");
@@ -865,16 +865,6 @@ async function importScripts(data: string) {
         reload();
     }
 
-}
-
-function copyScriptToClipboard(copy_button_tooltip: HTMLDivElement, copy_button: HTMLButtonElement, code: string) {
-    copy_button_tooltip.setAttribute("data-tip", "Copied!");
-    copy_button.innerHTML = "<span class=\"material-symbols-outlined\">check</span>";
-    setTimeout(() => {
-        copy_button_tooltip.setAttribute("data-tip", "Copy to clipboard");
-        copy_button.innerHTML = "<span class=\"material-symbols-outlined\">content_copy</span>";
-    }, 250);
-    navigator.clipboard.writeText(code);
 }
 
 function reload() {
