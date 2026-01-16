@@ -1,4 +1,4 @@
-import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, getLineIndent, shortToast } from "./dashboard_utils.mjs";
+import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, insertTabOnTabKey, removeLastIndentOnShiftTabKey, shortToast } from "./dashboard_utils.mjs";
 import { CascadingStyleSheets } from "./interfaces.mjs";
 import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, editAutoInjectorUserCss, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
 
@@ -27,10 +27,10 @@ async function main() {
         autoIndentOnEnter("user-css", e);
         if (overwrite_tab_behaviour) {
             if (options.enable_remove_indent_shift_tab) {
-                removeLastIndentOnShiftTabKey(e);
+                removeLastIndentOnShiftTabKey("user-css", e);
             }
             if (options.enable_insert_tab_on_tab) {
-                insertTabOnTabKey(e);
+                insertTabOnTabKey("user-css", e);
             }
         }
     };
@@ -405,56 +405,6 @@ async function importUserCss(data: string) {
         reload();
     }
 
-}
-
-function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
-    if (e.key !== "Tab" || e.shiftKey === false) return;
-    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
-    if (user_css_text.selectionStart !== user_css_text.selectionEnd) return;
-    e.preventDefault();
-
-    const cursor_pos = user_css_text.selectionStart;
-    let before = user_css_text.value.slice(0, cursor_pos);
-    const after = user_css_text.value.slice(cursor_pos);
-
-    let line = before.slice(before.lastIndexOf("\n") + 1);
-    let indent = getLineIndent(line);
-    before = before.slice(0, before.length - line.length);
-    line = line.slice(indent.length);
-    let symbols_removed = 0;
-    if (indent.endsWith("\t")) {
-        indent = indent.slice(0, indent.length - 1);
-        symbols_removed = 1;
-    } else if (indent.endsWith(" ")) {
-        let count_of_spaces = 0;
-        for (let i = indent.length - 1; i >= 0 && indent[i] === " "; i--) {
-            count_of_spaces++;
-        }
-        console.log(count_of_spaces);
-        const remove = (count_of_spaces % 4 === 0) ? 4 : count_of_spaces % 4;
-        indent = indent.slice(0, indent.length - remove);
-        symbols_removed = remove;
-    }
-
-    user_css_text.value = `${before}${indent}${line}${after}`;
-    user_css_text.selectionStart = cursor_pos - symbols_removed;
-    user_css_text.selectionEnd = cursor_pos - symbols_removed;
-}
-
-function insertTabOnTabKey(e: KeyboardEvent) {
-    if (e.key !== "Tab" || e.shiftKey === true) return;
-    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
-    if (user_css_text.selectionStart !== user_css_text.selectionEnd) return;
-    e.preventDefault();
-
-    const cursor_pos = user_css_text.selectionStart;
-    const before = user_css_text.value.slice(0, cursor_pos);
-    const after = user_css_text.value.slice(cursor_pos);
-
-    user_css_text.value = `${before}\t${after}`;
-
-    user_css_text.selectionStart = cursor_pos + 1;
-    user_css_text.selectionEnd = cursor_pos + 1;
 }
 
 function reload() {

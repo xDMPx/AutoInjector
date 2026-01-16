@@ -1,3 +1,53 @@
+export function insertTabOnTabKey(id: string, e: KeyboardEvent) {
+    if (e.key !== "Tab" || e.shiftKey === true) return;
+    const text_area = document.getElementById(id) as HTMLTextAreaElement;
+    if (text_area.selectionStart !== text_area.selectionEnd) return;
+    e.preventDefault();
+
+    const cursor_pos = text_area.selectionStart;
+    const before = text_area.value.slice(0, cursor_pos);
+    const after = text_area.value.slice(cursor_pos);
+
+    text_area.value = `${before}\t${after}`;
+
+    text_area.selectionStart = cursor_pos + 1;
+    text_area.selectionEnd = cursor_pos + 1;
+}
+
+export function removeLastIndentOnShiftTabKey(id: string, e: KeyboardEvent) {
+    if (e.key !== "Tab" || e.shiftKey === false) return;
+    const text_area = document.getElementById(id) as HTMLTextAreaElement;
+    if (text_area.selectionStart !== text_area.selectionEnd) return;
+    e.preventDefault();
+
+    const cursor_pos = text_area.selectionStart;
+    let before = text_area.value.slice(0, cursor_pos);
+    const after = text_area.value.slice(cursor_pos);
+
+    let line = before.slice(before.lastIndexOf("\n") + 1);
+    let indent = getLineIndent(line);
+    before = before.slice(0, before.length - line.length);
+    line = line.slice(indent.length);
+    let symbols_removed = 0;
+    if (indent.endsWith("\t")) {
+        indent = indent.slice(0, indent.length - 1);
+        symbols_removed = 1;
+    } else if (indent.endsWith(" ")) {
+        let count_of_spaces = 0;
+        for (let i = indent.length - 1; i >= 0 && indent[i] === " "; i--) {
+            count_of_spaces++;
+        }
+        console.log(count_of_spaces);
+        const remove = (count_of_spaces % 4 === 0) ? 4 : count_of_spaces % 4;
+        indent = indent.slice(0, indent.length - remove);
+        symbols_removed = remove;
+    }
+
+    text_area.value = `${before}${indent}${line}${after}`;
+    text_area.selectionStart = cursor_pos - symbols_removed;
+    text_area.selectionEnd = cursor_pos - symbols_removed;
+}
+
 export function copyContentToClipboard(copy_button_tooltip: HTMLDivElement, copy_button: HTMLButtonElement, content: string) {
     copy_button_tooltip.setAttribute("data-tip", "Copied!");
     copy_button.innerHTML = "<span class=\"material-symbols-outlined\">check</span>";

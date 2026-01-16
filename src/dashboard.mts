@@ -1,4 +1,4 @@
-import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, getLineIndent, shortToast } from "./dashboard_utils.mjs";
+import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, insertTabOnTabKey, removeLastIndentOnShiftTabKey, shortToast } from "./dashboard_utils.mjs";
 import { AutoInjectorMessage, AutoInjectorMessageType, Script, ScriptError } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
@@ -39,10 +39,10 @@ async function main() {
         autoIndentOnEnter("user-script", e);
         if (overwrite_tab_behaviour) {
             if (options.enable_remove_indent_shift_tab) {
-                removeLastIndentOnShiftTabKey(e);
+                removeLastIndentOnShiftTabKey("user-script", e);
             }
             if (options.enable_insert_tab_on_tab) {
-                insertTabOnTabKey(e);
+                insertTabOnTabKey("user-script", e);
             }
         }
     };
@@ -523,56 +523,6 @@ async function createInjectionErrorList() {
     }
 
     return list;
-}
-
-function insertTabOnTabKey(e: KeyboardEvent) {
-    if (e.key !== "Tab" || e.shiftKey === true) return;
-    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-    if (user_script_text.selectionStart !== user_script_text.selectionEnd) return;
-    e.preventDefault();
-
-    const cursor_pos = user_script_text.selectionStart;
-    const before = user_script_text.value.slice(0, cursor_pos);
-    const after = user_script_text.value.slice(cursor_pos);
-
-    user_script_text.value = `${before}\t${after}`;
-
-    user_script_text.selectionStart = cursor_pos + 1;
-    user_script_text.selectionEnd = cursor_pos + 1;
-}
-
-function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
-    if (e.key !== "Tab" || e.shiftKey === false) return;
-    const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
-    if (user_script_text.selectionStart !== user_script_text.selectionEnd) return;
-    e.preventDefault();
-
-    const cursor_pos = user_script_text.selectionStart;
-    let before = user_script_text.value.slice(0, cursor_pos);
-    const after = user_script_text.value.slice(cursor_pos);
-
-    let line = before.slice(before.lastIndexOf("\n") + 1);
-    let indent = getLineIndent(line);
-    before = before.slice(0, before.length - line.length);
-    line = line.slice(indent.length);
-    let symbols_removed = 0;
-    if (indent.endsWith("\t")) {
-        indent = indent.slice(0, indent.length - 1);
-        symbols_removed = 1;
-    } else if (indent.endsWith(" ")) {
-        let count_of_spaces = 0;
-        for (let i = indent.length - 1; i >= 0 && indent[i] === " "; i--) {
-            count_of_spaces++;
-        }
-        console.log(count_of_spaces);
-        const remove = (count_of_spaces % 4 === 0) ? 4 : count_of_spaces % 4;
-        indent = indent.slice(0, indent.length - remove);
-        symbols_removed = remove;
-    }
-
-    user_script_text.value = `${before}${indent}${line}${after}`;
-    user_script_text.selectionStart = cursor_pos - symbols_removed;
-    user_script_text.selectionEnd = cursor_pos - symbols_removed;
 }
 
 async function saveScript(e: SubmitEvent) {
