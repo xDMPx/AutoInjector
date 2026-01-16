@@ -1,4 +1,5 @@
 import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, getLineIndent, shortToast } from "./dashboard_utils.mjs";
+import { CascadingStyleSheets } from "./interfaces.mjs";
 import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, editAutoInjectorUserCss, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
 
 async function main() {
@@ -38,6 +39,9 @@ async function main() {
 
     const export_button = document.getElementById("btn_export")!;
     export_button.onclick = exportUserCss;
+
+    const import_button = document.getElementById("btn_import")!;
+    import_button.onclick = onImportUserCssClick;
 
     const btn_disable_all = document.getElementById("btn_disable_all")!;
     btn_disable_all.onclick = onDisableAllClick;
@@ -327,6 +331,78 @@ async function exportUserCss() {
         a.download = `autoinjector_css_${year}_${month}_${day}.json`;
 
         a.click();
+    }
+
+}
+
+async function onImportUserCssClick() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file !== undefined) {
+            const reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = (e) => {
+                if (e.target !== null && e.target.result != undefined)
+                    importUserCss(e.target?.result.toString())
+            }
+        }
+    };
+    input.click();
+}
+
+async function importUserCss(data: string) {
+    const auto_injector_user_css = await getAutoInjectorUserCSS()
+    const saved_user_css = (auto_injector_user_css?.map((s) => s.hash));
+    const saved_scripts_hash = new Set(saved_user_css);
+
+    const imported_scripts = JSON.parse(data) as { hash: number, name: string, url: string, css: string, enabled: boolean }[];
+    const names: Set<String> = new Set(auto_injector_user_css?.map((s) => s.name));
+    const user_css = [];
+    for (let u_css of imported_scripts) {
+        while (names.has(u_css.name)) {
+            const rand = Math.floor(Math.random() * 10000);
+            u_css.name += `_${rand}`;
+        }
+        names.add(u_css.name);
+        user_css.push(u_css);
+    }
+    const duplicate_user_css: CascadingStyleSheets[] = [];
+    let imported_user_css_count = 0;
+    for (const u_css of user_css) {
+        if (saved_scripts_hash.has(u_css.hash)) {
+            console.log("Duplicate user css:");
+            console.log(u_css.css);
+            duplicate_user_css.push(u_css);
+            continue;
+        };
+        imported_user_css_count++;
+        await saveAutoInjectorUserCSS(u_css.name, u_css.url, u_css.css, u_css.enabled);
+    }
+    if (duplicate_user_css.length > 0) {
+        const import_duplicate_user_css_modal = document.getElementById("import_duplicate_user_css_modal")! as HTMLDialogElement;
+        import_duplicate_user_css_modal.showModal();
+        import_duplicate_user_css_modal.onsubmit = async (e) => {
+            let duplicate_user_css_count = 0;
+            e.preventDefault();
+            if (e.submitter?.id === "import_duplicate_user_css_modal-yes") {
+                for (const u_css of duplicate_user_css) {
+                    imported_user_css_count++;
+                    duplicate_user_css_count++;
+                    await saveAutoInjectorUserCSS(u_css.name, u_css.url, u_css.css, u_css.enabled);
+                }
+            }
+            import_duplicate_user_css_modal.close();
+
+            shortToast(`Imported ${imported_user_css_count} user CSS(${duplicate_user_css_count} duplicate${duplicate_user_css_count > 1 ? 's' : ''}) successfully!`);
+            reload();
+        };
+    } else {
+        shortToast(`Imported ${imported_user_css_count} user CSS successfully!`);
+        reload();
     }
 
 }

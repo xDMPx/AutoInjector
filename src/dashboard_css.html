@@ -55,6 +55,13 @@
                 </span>
             </button>
         </div>
+        <div class="tooltip tooltip-left" data-tip="Import User CSS">
+            <button id="btn_import" class="menu-speed-dial-btn">
+                <span class="material-symbols-outlined">
+                    file_open
+                </span>
+            </button>
+        </div>
         <div class="tooltip tooltip-left" data-tip="Disable all User CSS">
             <button id="btn_disable_all" class="menu-speed-dial-btn">
                 <span class="material-symbols-outlined">
@@ -152,6 +159,28 @@
         <button>close</button>
     </form>
 </dialog>
+
+<dialog id="import_duplicate_user_css_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="modal-box-h3">
+            Duplicate user CSS detected. Import duplicates?
+        </h3>
+        <form>
+            <div class="modal-confirmation-form">
+                <div class="form-control">
+                    <button id="import_duplicate_user_css_modal-yes" class="btn btn-primary">Yes</button>
+                </div>
+                <form method="dialog">
+                    <button id="import_duplicate_user_css-no" class="btn btn-neutral">No</button>
+                </form>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
 
 <dialog id="about_modal" class="modal">
     <div class="modal-box">
