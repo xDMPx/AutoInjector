@@ -36,6 +36,9 @@ async function main() {
     autoResizeTextArea("user-css");
 
 
+    const export_button = document.getElementById("btn_export")!;
+    export_button.onclick = exportUserCss;
+
     const btn_disable_all = document.getElementById("btn_disable_all")!;
     btn_disable_all.onclick = onDisableAllClick;
 
@@ -314,6 +317,28 @@ async function onDisableAllClick() {
         await disableAutoInjectorUserCSS(u_css.hash);
     }
     reload();
+}
+
+async function exportUserCss() {
+    let user_css = await getAutoInjectorUserCSS();
+    if (user_css !== undefined) {
+        const user_css_json = JSON.stringify(user_css, null);
+        const url = `data:application/json;base64,${btoa(user_css_json)}`;
+        const a = document.createElement("a");
+        a.href = url;
+
+        const date = new Date();
+        const year = date.getFullYear();
+        console.log(year);
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        console.log(month);
+        const day = date.getDate().toString().padStart(2, "0");
+        console.log(day);
+        a.download = `autoinjector_css_${year}_${month}_${day}.json`;
+
+        a.click();
+    }
+
 }
 
 function removeLastIndentOnShiftTabKey(e: KeyboardEvent) {
