@@ -65,6 +65,22 @@ export function autoResizeTextArea(id: string) {
     text_area.style.height = `${text_area.scrollHeight}px`;
 }
 
+export function expandTextArea(textarea_div_id: string, expand_textarea_id: string) {
+    const textarea_div = document.getElementById(textarea_div_id) as HTMLDivElement;
+    const expand_textarea = document.getElementById(expand_textarea_id) as HTMLDivElement;
+    if (expand_textarea.getAttribute("expanded") === "false") {
+        textarea_div.style.marginLeft = "calc(-50vw + 54%)";
+        textarea_div.style.marginRight = "calc(-50vw + 54%)";
+        expand_textarea.innerHTML = `<span class="material-symbols-outlined">collapse_content</span>`;
+        expand_textarea.setAttribute("expanded", "true");
+    } else {
+        textarea_div.style.marginLeft = "";
+        textarea_div.style.marginRight = "";
+        expand_textarea.innerHTML = `<span class="material-symbols-outlined">fit_page_width</span>`;
+        expand_textarea.setAttribute("expanded", "false");
+    }
+}
+
 export function autoIndentOnEnter(id: string, e: KeyboardEvent) {
     if (e.key !== "Enter") return;
     const text_area = document.getElementById(id) as HTMLTextAreaElement;

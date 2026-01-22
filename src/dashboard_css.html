@@ -32,7 +32,16 @@
                     pattern="^[^*]*\*?$" />
                 <div class="validator-hint">Only one wildcard allowed at the end</div>
             </label>
-            <textarea required class="outline p-4" id="user-css" spellcheck="false" placeholder="CSS"></textarea>
+            <div id="user-css-textarea-div" class="relative">
+                <div id="user-css-expand-textarea" class="btn btn-sm btn-circle btn-ghost absolute right-1 top-1"
+                    expanded="false">
+                    <span class="material-symbols-outlined">
+                        fit_page_width
+                    </span>
+                </div>
+                <textarea required class="outline p-4 w-full" id="user-css" spellcheck="false"
+                    placeholder="CSS"></textarea>
+            </div>
             <button class="btn btn-primary" id="submit-user-css">Submit</button>
         </form>
         <div id="user-css-div"></div>

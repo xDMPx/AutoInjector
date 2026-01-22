@@ -1,4 +1,4 @@
-import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, insertTabOnTabKey, removeLastIndentOnShiftTabKey, shortToast } from "./dashboard_utils.mjs";
+import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, expandTextArea, insertTabOnTabKey, removeLastIndentOnShiftTabKey, shortToast } from "./dashboard_utils.mjs";
 import { CascadingStyleSheets } from "./interfaces.mjs";
 import { deleteAutoInjectorUserCSS, disableAutoInjectorUserCSS, editAutoInjectorUserCss, enableAutoInjectorUserCSS, getAutoInjectorOptions, getAutoInjectorUserCSS, saveAutoInjectorUserCSS } from "./utils.mjs";
 
@@ -36,6 +36,8 @@ async function main() {
     };
     autoResizeTextArea("user-css");
 
+    const user_css_expand_textarea = document.getElementById("user-css-expand-textarea") as HTMLDivElement;
+    user_css_expand_textarea.onclick = () => expandTextArea("user-css-textarea-div", "user-css-expand-textarea");
 
     const export_button = document.getElementById("btn_export")!;
     export_button.onclick = exportUserCss;
@@ -411,10 +413,17 @@ function reload() {
     const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
     const user_css_name = document.getElementById("user-css-name") as HTMLInputElement;
     const user_css_url = document.getElementById("user-css-url") as HTMLTextAreaElement;
+    const user_css_text_div = document.getElementById("user-css-textarea-div") as HTMLDivElement;
+    const user_css_expand_textarea = document.getElementById("user-css-expand-textarea") as HTMLDivElement;
     user_css_text.value = "";
     user_css_name.value = "";
     user_css_url.value = "*";
     autoResizeTextArea("user-css");
+    user_css_text_div.style.marginRight = "";
+    user_css_text_div.style.marginLeft = "";
+    user_css_expand_textarea.setAttribute("expanded", "false");
+    user_css_expand_textarea.innerHTML = `<span class="material-symbols-outlined">fit_page_width</span>`;
+
 
     const submit_css_form = document.getElementById("submit-user-css-form") as HTMLFormElement;
     submit_css_form.reset();

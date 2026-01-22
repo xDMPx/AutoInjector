@@ -36,8 +36,16 @@
                 <span class="label">Inject Immediately</span>
                 <input id="user-script-inject-immediately" type="checkbox" class="checkbox checkbox-primary" />
             </label>
-            <textarea required class="outline p-4" id="user-script" spellcheck="false"
-                placeholder="JavaScript"></textarea>
+            <div id="user-script-textarea-div" class="relative">
+                <div id="user-script-expand-textarea" class="btn btn-sm btn-circle btn-ghost absolute right-1 top-1"
+                    expanded="false">
+                    <span class="material-symbols-outlined">
+                        fit_page_width
+                    </span>
+                </div>
+                <textarea required class="outline p-4 w-full" id="user-script" spellcheck="false"
+                    placeholder="JavaScript"></textarea>
+            </div>
             <button class="btn btn-primary" id="submit-script">Submit</button>
         </form>
         <div id="script-div"></div>

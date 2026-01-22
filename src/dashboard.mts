@@ -1,4 +1,4 @@
-import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, insertTabOnTabKey, removeLastIndentOnShiftTabKey, shortToast } from "./dashboard_utils.mjs";
+import { autoIndentOnEnter, autoResizeTextArea, copyContentToClipboard, expandTextArea, insertTabOnTabKey, removeLastIndentOnShiftTabKey, shortToast } from "./dashboard_utils.mjs";
 import { AutoInjectorMessage, AutoInjectorMessageType, Script, ScriptError } from "./interfaces.mjs";
 import { deleteAutoInjectorScript, deleteAutoInjectorScriptErrors, disableAutoInjectorScript, djb2Hash, editAutoInjectorScript, enableAutoInjectorScript, getAutoInjectorOptions, getAutoInjectorScriptByHash, getAutoInjectorScriptErrors, getAutoInjectorScripts, saveAutoInjectorScript } from "./utils.mjs";
 
@@ -46,6 +46,10 @@ async function main() {
             }
         }
     };
+
+    const user_script_expand_textarea = document.getElementById("user-script-expand-textarea") as HTMLDivElement;
+    user_script_expand_textarea.onclick = () => expandTextArea("user-script-textarea-div", "user-script-expand-textarea");
+
     autoResizeTextArea("user-script");
     if (!options.enable_setting_inject_immediately) {
         document.getElementById("user-script-inject-immediately-label")!.style.display = "none";
@@ -822,12 +826,18 @@ function reload() {
     const user_script_text = document.getElementById("user-script") as HTMLTextAreaElement;
     const user_script_name = document.getElementById("user-script-name") as HTMLInputElement;
     const user_script_inject_immediately = document.getElementById("user-script-inject-immediately") as HTMLInputElement;
+    const user_script_text_div = document.getElementById("user-script-textarea-div") as HTMLDivElement;
+    const user_script_expand_textarea = document.getElementById("user-script-expand-textarea") as HTMLDivElement;
 
     user_script_text.value = "";
     user_script_name.value = "";
     user_script_url.value = "*";
     user_script_inject_immediately.checked = false;
     autoResizeTextArea("user-script");
+    user_script_text_div.style.marginRight = "";
+    user_script_text_div.style.marginLeft = "";
+    user_script_expand_textarea.setAttribute("expanded", "false");
+    user_script_expand_textarea.innerHTML = `<span class="material-symbols-outlined">fit_page_width</span>`;
 
     const submit_script_form = document.getElementById("submit-script-form") as HTMLFormElement;
     submit_script_form.reset();
