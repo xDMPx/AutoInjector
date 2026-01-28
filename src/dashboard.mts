@@ -714,8 +714,9 @@ async function onDisableAllClick() {
     let scripts = await getAutoInjectorScripts();
     if (scripts === undefined) return;
     for (const script of scripts) {
-        disableAutoInjectorScript(script.hash);
+        await disableAutoInjectorScript(script.hash);
     }
+    reload();
 }
 
 async function exportScripts() {
