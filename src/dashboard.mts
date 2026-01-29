@@ -144,7 +144,7 @@ async function main() {
     error_modal_sort_by_url.onclick = () => {
         errors_date_sort_order = SortOrder.None;
         errors_name_sort_order = SortOrder.None;
-        document.getElementById("error_modal_sort_by_url_symbol")!.innerText = "";
+        document.getElementById("error_modal_sort_by_date_symbol")!.innerText = "";
         document.getElementById("error_modal_sort_by_name_symbol")!.innerText = "";
 
         switch (errors_url_sort_order) {
