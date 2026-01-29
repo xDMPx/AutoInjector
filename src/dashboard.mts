@@ -515,6 +515,7 @@ async function createInjectionErrorList() {
         dismiss_button.onclick = async () => {
             await deleteAutoInjectorScriptErrors(error);
             list_item.remove();
+            createInjectionErrorFilters();
             if (list.children.length == 0) {
                 const error_display_modal = document.getElementById("error_display_modal")! as HTMLDialogElement;
                 error_display_modal.close();
