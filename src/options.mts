@@ -67,6 +67,29 @@ async function main() {
         auto_injector_options.warn_about_dupilcate_scripts = warn_about_dupilcate_scripts_checkbox.checked;
         setAutoInjectorOptions(auto_injector_options);
     };
+
+    const export_btn = document.getElementById("export-btn") as HTMLButtonElement;
+    export_btn.onclick = async () => {
+        const auto_injector_options = (await getAutoInjectorOptions())!;
+        if (auto_injector_options !== undefined) {
+            const auto_injector_options_json = JSON.stringify(auto_injector_options, null);
+            const url = `data:application/json;base64,${btoa(auto_injector_options_json)}`;
+            const a = document.createElement("a");
+            a.href = url;
+
+            const date = new Date();
+            const year = date.getFullYear();
+            console.log(year);
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            console.log(month);
+            const day = date.getDate().toString().padStart(2, "0");
+            console.log(day);
+            a.download = `autoinjector_settings_${year}_${month}_${day}.json`;
+
+            a.click();
+        }
+
+    };
 }
 
 main();
