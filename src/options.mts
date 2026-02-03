@@ -90,6 +90,57 @@ async function main() {
         }
 
     };
+
+    const import_btn = document.getElementById("import-btn") as HTMLButtonElement;
+    import_btn.onclick = () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+
+        input.onchange = (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (file !== undefined) {
+                const reader = new FileReader();
+                reader.readAsText(file);
+                reader.onload = (e) => {
+                    if (e.target !== null && e.target.result != undefined)
+                        importSettings(e.target?.result.toString())
+                }
+            }
+        };
+        input.click();
+    };
+
 }
 
 main();
+
+async function importSettings(data: string) {
+    const imported_settings = JSON.parse(data) as {
+        confirmation_dialog_remove: boolean
+        confirmation_dialog_edit: boolean
+        confirmation_dialog_edit_cancel: boolean
+        enable_remove_indent_shift_tab: boolean
+        enable_insert_tab_on_tab: boolean
+        enable_setting_inject_immediately: boolean
+        warn_about_dupilcate_scripts: boolean
+    }
+
+    const auto_injector_options = (await getAutoInjectorOptions())!;
+    auto_injector_options.confirmation_dialog_remove = imported_settings.confirmation_dialog_remove;
+    auto_injector_options.confirmation_dialog_edit = imported_settings.confirmation_dialog_edit;
+    auto_injector_options.confirmation_dialog_edit_cancel = imported_settings.confirmation_dialog_edit_cancel;
+    auto_injector_options.enable_remove_indent_shift_tab = imported_settings.enable_remove_indent_shift_tab;
+    auto_injector_options.enable_insert_tab_on_tab = imported_settings.enable_insert_tab_on_tab;
+    auto_injector_options.enable_setting_inject_immediately = imported_settings.enable_setting_inject_immediately;
+    auto_injector_options.warn_about_dupilcate_scripts = imported_settings.warn_about_dupilcate_scripts;
+
+    setAutoInjectorOptions(auto_injector_options).then(() => {
+        const msg: AutoInjectorMessage = {
+            type: AutoInjectorMessageType.SettingsUpdate,
+        } as AutoInjectorMessage;
+        chrome.runtime.sendMessage(msg)
+    })
+
+    main();
+}
