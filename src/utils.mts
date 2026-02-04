@@ -100,6 +100,7 @@ export async function saveAutoInjectorUserCSS(name: string, url: string, css: st
         name: name,
         url: url,
         css: css,
+        css_hash: djb2Hash(css),
         enabled: enabled,
     });
     await chrome.storage.local.set({ "user_css": user_css });
@@ -171,6 +172,7 @@ export async function editAutoInjectorUserCss(hash: number, name: string, url: s
     user_css[i].name = name;
     user_css[i].url = url;
     user_css[i].css = css;
+    user_css[i].css_hash = djb2Hash(css);
 
     await chrome.storage.local.set({ "user_css": user_css });
 
@@ -310,6 +312,15 @@ export async function getAutoInjectorScriptByHash(hash: number): Promise<Script 
     }
 
     return scripts.find((s) => s.hash === hash)
+}
+
+export async function getAutoInjectorUserCSSByHash(hash: number): Promise<CascadingStyleSheets | undefined> {
+    let { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: CascadingStyleSheets[] | undefined };
+    if (user_css === undefined) {
+        user_css = [];
+    }
+
+    return user_css.find((s) => s.hash === hash);
 }
 
 export async function deletedAutoInjectorScriptErrorsForHash(hash: number) {

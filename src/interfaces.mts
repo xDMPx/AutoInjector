@@ -13,6 +13,7 @@ export interface CascadingStyleSheets {
     name: string,
     url: string,
     css: string,
+    css_hash: number,
     enabled: boolean,
 }
 
