@@ -36,6 +36,7 @@ export interface AutoInjectorOptions {
     enable_insert_tab_on_tab: boolean
     enable_setting_inject_immediately: boolean
     warn_about_dupilcate_scripts: boolean
+    warn_about_dupilcate_user_css: boolean
 }
 
 export interface ScriptError {

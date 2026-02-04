@@ -61,7 +61,8 @@ async function migrateFrom021To022() {
             enable_remove_indent_shift_tab: true,
             enable_insert_tab_on_tab: true,
             enable_setting_inject_immediately: false,
-            warn_about_dupilcate_scripts: true
+            warn_about_dupilcate_scripts: true,
+            warn_about_dupilcate_user_css: true
         }
         setAutoInjectorOptions(ai_options);
     }
@@ -145,6 +146,12 @@ async function migrateFrom030To031() {
         return s;
     });
     await chrome.storage.local.set({ "user_css": migrated_user_css });
+
+    let { ai_options } = await chrome.storage.local.get("ai_options") as { [key: string]: AutoInjectorOptions };
+    if (ai_options.warn_about_dupilcate_user_css === undefined) {
+        ai_options.warn_about_dupilcate_user_css = true;
+        await setAutoInjectorOptions(ai_options);
+    }
 }
 
 chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {

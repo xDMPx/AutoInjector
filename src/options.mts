@@ -68,6 +68,15 @@ async function main() {
         setAutoInjectorOptions(auto_injector_options);
     };
 
+    const warn_about_dupilcate_user_css_checkbox = document.getElementById("warn_about_dupilcate_user_css_checkbox") as HTMLInputElement;
+    warn_about_dupilcate_user_css_checkbox.checked = auto_injector_options.warn_about_dupilcate_user_css;
+    warn_about_dupilcate_user_css_checkbox.onclick = async () => {
+        const auto_injector_options = (await getAutoInjectorOptions())!;
+        const warn_about_dupilcate_user_css_checkbox = document.getElementById("warn_about_dupilcate_user_css_checkbox") as HTMLInputElement;
+        auto_injector_options.warn_about_dupilcate_user_css = warn_about_dupilcate_user_css_checkbox.checked;
+        setAutoInjectorOptions(auto_injector_options);
+    };
+
     const export_btn = document.getElementById("export-btn") as HTMLButtonElement;
     export_btn.onclick = async () => {
         const auto_injector_options = (await getAutoInjectorOptions())!;

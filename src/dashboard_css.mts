@@ -215,25 +215,31 @@ async function saveUserCss(e: SubmitEvent) {
         }
     };
 
-    const user_css = await getAutoInjectorUserCSS();
-    const duplicate_user_css = user_css?.find((s) => s.css_hash === djb2Hash(user_css_text.value))
-    if (duplicate_user_css !== undefined) {
-        const save_duplicate_user_css_modal = document.getElementById("save_duplicate_user_css_modal")! as HTMLDialogElement;
-        const modal_text = save_duplicate_user_css_modal.getElementsByClassName("modal-box-h3").item(0)!;
-        const duplicate_user_css_name = (await getAutoInjectorUserCSSByHash(duplicate_user_css.hash))?.name!;
-        modal_text.textContent = modal_text.textContent.replace("{}", duplicate_user_css_name);
 
-        save_duplicate_user_css_modal.showModal();
-        save_duplicate_user_css_modal.onsubmit = async (e) => {
-            e.preventDefault();
-            if (e.submitter?.id === "save_duplicate_user_css_modal-yes") {
-                saveUserCss();
+    const options = await getAutoInjectorOptions();
+    if (options.warn_about_dupilcate_user_css) {
+        const user_css = await getAutoInjectorUserCSS();
+        const duplicate_user_css = user_css?.find((s) => s.css_hash === djb2Hash(user_css_text.value))
+        if (duplicate_user_css !== undefined) {
+            const save_duplicate_user_css_modal = document.getElementById("save_duplicate_user_css_modal")! as HTMLDialogElement;
+            const modal_text = save_duplicate_user_css_modal.getElementsByClassName("modal-box-h3").item(0)!;
+            const duplicate_user_css_name = (await getAutoInjectorUserCSSByHash(duplicate_user_css.hash))?.name!;
+            modal_text.textContent = modal_text.textContent.replace("{}", duplicate_user_css_name);
+
+            save_duplicate_user_css_modal.showModal();
+            save_duplicate_user_css_modal.onsubmit = async (e) => {
+                e.preventDefault();
+                if (e.submitter?.id === "save_duplicate_user_css_modal-yes") {
+                    saveUserCss();
+                }
+                save_duplicate_user_css_modal.close();
+
             }
-            save_duplicate_user_css_modal.close();
-
         }
-    }
-    else {
+        else {
+            saveUserCss();
+        }
+    } else {
         saveUserCss();
     }
 }
@@ -301,40 +307,58 @@ async function editUserCss(e: SubmitEvent, hash: number) {
         }
     };
 
-    const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
-    const user_css = await getAutoInjectorUserCSSByHash(hash);
-    const user_css_hash = user_css?.hash;
-    const ai_user_css = await getAutoInjectorUserCSS();
-    const duplicate_user_css = ai_user_css?.find((s) => s.css_hash === djb2Hash(user_css_text.value) && s.hash !== user_css_hash)
-    const options = await getAutoInjectorOptions();
-    if (duplicate_user_css !== undefined) {
-        const save_duplicate_user_css_modal = document.getElementById("save_duplicate_user_css_modal")! as HTMLDialogElement;
-        const modal_text = save_duplicate_user_css_modal.getElementsByClassName("modal-box-h3").item(0)!;
-        const duplicate_user_css_name = (await getAutoInjectorUserCSSByHash(duplicate_user_css.hash))?.name!;
-        modal_text.textContent = modal_text.textContent.replace("{}", duplicate_user_css_name);
 
-        save_duplicate_user_css_modal.showModal();
-        save_duplicate_user_css_modal.onsubmit = async (e) => {
-            e.preventDefault();
-            if (e.submitter?.id === "save_duplicate_user_css_modal-yes") {
-                if (options.confirmation_dialog_edit) {
-                    const edit_script_modal = document.getElementById("edit_user_css_modal")! as HTMLDialogElement;
-                    edit_script_modal.showModal();
-                    edit_script_modal.onsubmit = async (e) => {
-                        e.preventDefault();
-                        if (e.submitter?.id === "edit_user_css_modal-yes") {
-                            await editUserCss();
-                        }
-                        edit_script_modal.close();
-                    };
-                } else {
-                    await editUserCss();
+    const options = await getAutoInjectorOptions();
+    if (options.warn_about_dupilcate_user_css) {
+        const user_css_text = document.getElementById("user-css") as HTMLTextAreaElement;
+        const user_css = await getAutoInjectorUserCSSByHash(hash);
+        const user_css_hash = user_css?.hash;
+        const ai_user_css = await getAutoInjectorUserCSS();
+        const duplicate_user_css = ai_user_css?.find((s) => s.css_hash === djb2Hash(user_css_text.value) && s.hash !== user_css_hash)
+        const options = await getAutoInjectorOptions();
+        if (duplicate_user_css !== undefined) {
+            const save_duplicate_user_css_modal = document.getElementById("save_duplicate_user_css_modal")! as HTMLDialogElement;
+            const modal_text = save_duplicate_user_css_modal.getElementsByClassName("modal-box-h3").item(0)!;
+            const duplicate_user_css_name = (await getAutoInjectorUserCSSByHash(duplicate_user_css.hash))?.name!;
+            modal_text.textContent = modal_text.textContent.replace("{}", duplicate_user_css_name);
+
+            save_duplicate_user_css_modal.showModal();
+            save_duplicate_user_css_modal.onsubmit = async (e) => {
+                e.preventDefault();
+                if (e.submitter?.id === "save_duplicate_user_css_modal-yes") {
+                    if (options.confirmation_dialog_edit) {
+                        const edit_script_modal = document.getElementById("edit_user_css_modal")! as HTMLDialogElement;
+                        edit_script_modal.showModal();
+                        edit_script_modal.onsubmit = async (e) => {
+                            e.preventDefault();
+                            if (e.submitter?.id === "edit_user_css_modal-yes") {
+                                await editUserCss();
+                            }
+                            edit_script_modal.close();
+                        };
+                    } else {
+                        await editUserCss();
+                    }
                 }
+                save_duplicate_user_css_modal.close();
             }
-            save_duplicate_user_css_modal.close();
         }
-    }
-    else {
+        else {
+            if (options.confirmation_dialog_edit) {
+                const edit_user_css_modal = document.getElementById("edit_user_css_modal")! as HTMLDialogElement;
+                edit_user_css_modal.showModal();
+                edit_user_css_modal.onsubmit = async (e) => {
+                    e.preventDefault();
+                    if (e.submitter?.id === "edit_user_css_modal-yes") {
+                        await editUserCss();
+                    }
+                    edit_user_css_modal.close();
+                };
+            } else {
+                await editUserCss();
+            }
+        }
+    } else {
         if (options.confirmation_dialog_edit) {
             const edit_user_css_modal = document.getElementById("edit_user_css_modal")! as HTMLDialogElement;
             edit_user_css_modal.showModal();
