@@ -413,12 +413,17 @@ async function onImportUserCssClick() {
 async function importUserCss(data: string) {
     const auto_injector_user_css = await getAutoInjectorUserCSS()
     const saved_user_css = (auto_injector_user_css?.map((s) => s.hash));
-    const saved_scripts_hash = new Set(saved_user_css);
+    const saved_user_css_hash = new Set(saved_user_css);
 
-    const imported_scripts = JSON.parse(data) as { hash: number, name: string, url: string, css: string, enabled: boolean, css_hash: number }[];
+    const imported_user_css = JSON.parse(data) as { hash: number, name: string, url: string, css: string, enabled: boolean, css_hash: number | undefined }[];
+    const migrated_user_css: CascadingStyleSheets[] = imported_user_css.map((s) => {
+        s.hash = djb2Hash(s.name + s.css);
+        s.css_hash = djb2Hash(s.css);
+        return { hash: s.hash, name: s.name, url: s.url, css: s.css, css_hash: s.css_hash, enabled: s.enabled };
+    });
     const names: Set<String> = new Set(auto_injector_user_css?.map((s) => s.name));
     const user_css = [];
-    for (let u_css of imported_scripts) {
+    for (let u_css of migrated_user_css) {
         while (names.has(u_css.name)) {
             const rand = Math.floor(Math.random() * 10000);
             u_css.name += `_${rand}`;
@@ -429,7 +434,7 @@ async function importUserCss(data: string) {
     const duplicate_user_css: CascadingStyleSheets[] = [];
     let imported_user_css_count = 0;
     for (const u_css of user_css) {
-        if (saved_scripts_hash.has(u_css.hash)) {
+        if (saved_user_css_hash.has(u_css.hash)) {
             console.log("Duplicate user css:");
             console.log(u_css.css);
             duplicate_user_css.push(u_css);

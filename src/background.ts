@@ -22,6 +22,7 @@ chrome.runtime.onInstalled.addListener(async (details: chrome.runtime.InstalledD
         await migrateFrom023To024();
         await migrateFrom024To025();
         await migrateFrom025To026();
+        await migrateFrom030To031();
         let scripts = await getAutoInjectorScripts();
         if (scripts === undefined) {
             saveAutoInjectorScript("AutoInjector Test Script", "*", "alert(\"Hello! I am an alert box!! Caused by AutoInjector\");", false, false);
@@ -131,6 +132,19 @@ async function migrateFrom025To026() {
         ai_options.warn_about_dupilcate_scripts = true;
         await setAutoInjectorOptions(ai_options);
     }
+}
+
+async function migrateFrom030To031() {
+    const { user_css } = await chrome.storage.local.get("user_css") as { [key: string]: { hash: number, name: string, url: string, css: string, enabled: boolean, css_hash: number | undefined }[] | undefined };
+    if (user_css === undefined) return;
+    const migrated_user_css = user_css.map((s) => {
+        if (s.css_hash === undefined) {
+            s.hash = djb2Hash(s.name + s.css);
+            s.css_hash = djb2Hash(s.css);
+        }
+        return s;
+    });
+    await chrome.storage.local.set({ "user_css": migrated_user_css });
 }
 
 chrome.action.onClicked.addListener(async (_tab: chrome.tabs.Tab) => {

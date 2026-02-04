@@ -1,6 +1,6 @@
 {
   "name": "autoinjector",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Automatic injection of scripts and CSS",
   "license": "MIT",
   "author": "xdmpx",
