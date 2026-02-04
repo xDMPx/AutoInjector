@@ -411,8 +411,8 @@ async function onImportUserCssClick() {
 }
 
 async function importUserCss(data: string) {
-    const auto_injector_user_css = await getAutoInjectorUserCSS()
-    const saved_user_css = (auto_injector_user_css?.map((s) => s.hash));
+    const auto_injector_user_css = await getAutoInjectorUserCSS();
+    const saved_user_css = (auto_injector_user_css?.map((s) => s.css_hash));
     const saved_user_css_hash = new Set(saved_user_css);
 
     const imported_user_css = JSON.parse(data) as { hash: number, name: string, url: string, css: string, enabled: boolean, css_hash: number | undefined }[];
@@ -434,7 +434,7 @@ async function importUserCss(data: string) {
     const duplicate_user_css: CascadingStyleSheets[] = [];
     let imported_user_css_count = 0;
     for (const u_css of user_css) {
-        if (saved_user_css_hash.has(u_css.hash)) {
+        if (saved_user_css_hash.has(u_css.css_hash)) {
             console.log("Duplicate user css:");
             console.log(u_css.css);
             duplicate_user_css.push(u_css);
