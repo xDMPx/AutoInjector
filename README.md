@@ -3,6 +3,7 @@
 Automatic injection of scripts and CSS into websites
 
 ## Features
+
 - Scripts and user CSS injection
 - Add, edit, and delete scripts using a built-in script's dashboard
 - Limiting of injection to specific target URLs or use fuzzy matching with `*`
@@ -43,7 +44,7 @@ Automatic injection of scripts and CSS into websites
 
 The extension is not published on the Firefox Add-ons.
 
-To install download the latest `.xpi` file from the <a href="/xdmpx/autoinjector/releases">releases</a> page.
+To install download the latest `.xpi` file from the [releases](../../releases) page.
 
 In Firefox, open `about:addons` -> `Install Add‑on From File...` and select the downloaded `.xpi`.
 
